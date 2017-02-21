@@ -45,7 +45,7 @@ eval {
     if ($@) { 
          print "ERROR:".$@;
     } else {
-         print Dumper($solrret) ."\n";
+         print Dumper($solrret->{response}) ."\n";
     }
     ok(defined($solrret),"_search_solr command returned result.");
     

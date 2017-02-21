@@ -110,9 +110,9 @@ sub new
 
 
 
-=head2 index_genomes_in_solr
+=head2 index_in_solr
 
-  $output = $obj->index_genomes_in_solr($params)
+  $output = $obj->index_in_solr($params)
 
 =over 4
 
@@ -121,62 +121,12 @@ sub new
 =begin html
 
 <pre>
-$params is a KBSolrUtil.IndexGenomesInSolrParams
-$output is a reference to a list where each element is a KBSolrUtil.SolrGenomeFeatureData
-IndexGenomesInSolrParams is a reference to a hash where the following keys are defined:
-	genomes has a value which is a reference to a list where each element is a KBSolrUtil.KBaseReferenceGenomeData
-	solr_core has a value which is a string
-	create_report has a value which is a KBSolrUtil.bool
-KBaseReferenceGenomeData is a reference to a hash where the following keys are defined:
-	ref has a value which is a string
-	id has a value which is a string
-	workspace_name has a value which is a string
-	source_id has a value which is a string
-	accession has a value which is a string
-	name has a value which is a string
-	version has a value which is a string
-	source has a value which is a string
-	domain has a value which is a string
-bool is an int
-SolrGenomeFeatureData is a reference to a hash where the following keys are defined:
-	genome_feature_id has a value which is a string
-	genome_id has a value which is a string
-	feature_id has a value which is a string
-	ws_ref has a value which is a string
-	feature_type has a value which is a string
-	aliases has a value which is a string
-	scientific_name has a value which is a string
-	domain has a value which is a string
-	functions has a value which is a string
-	genome_source has a value which is a string
-	go_ontology_description has a value which is a string
-	go_ontology_domain has a value which is a string
-	gene_name has a value which is a string
-	object_name has a value which is a string
-	location_contig has a value which is a string
-	location_strand has a value which is a string
-	taxonomy has a value which is a string
-	workspace_name has a value which is a string
-	genetic_code has a value which is a string
-	md5 has a value which is a string
-	tax_id has a value which is a string
-	assembly_ref has a value which is a string
-	taxonomy_ref has a value which is a string
-	ontology_namespaces has a value which is a string
-	ontology_ids has a value which is a string
-	ontology_names has a value which is a string
-	ontology_lineages has a value which is a string
-	dna_sequence_length has a value which is an int
-	genome_dna_size has a value which is an int
-	location_begin has a value which is an int
-	location_end has a value which is an int
-	num_cds has a value which is an int
-	num_contigs has a value which is an int
-	protein_translation_length has a value which is an int
-	gc_content has a value which is a float
-	complete has a value which is a KBSolrUtil.bool
-	refseq_category has a value which is a string
-	save_date has a value which is a string
+$params is a KBSolrUtil.IndexInSolrParams
+$output is an int
+IndexInSolrParams is a reference to a hash where the following keys are defined:
+	search_core has a value which is a string
+	doc_data has a value which is a reference to a list where each element is a KBSolrUtil.docdata
+docdata is a reference to a hash where the key is a string and the value is a string
 
 </pre>
 
@@ -184,75 +134,25 @@ SolrGenomeFeatureData is a reference to a hash where the following keys are defi
 
 =begin text
 
-$params is a KBSolrUtil.IndexGenomesInSolrParams
-$output is a reference to a list where each element is a KBSolrUtil.SolrGenomeFeatureData
-IndexGenomesInSolrParams is a reference to a hash where the following keys are defined:
-	genomes has a value which is a reference to a list where each element is a KBSolrUtil.KBaseReferenceGenomeData
-	solr_core has a value which is a string
-	create_report has a value which is a KBSolrUtil.bool
-KBaseReferenceGenomeData is a reference to a hash where the following keys are defined:
-	ref has a value which is a string
-	id has a value which is a string
-	workspace_name has a value which is a string
-	source_id has a value which is a string
-	accession has a value which is a string
-	name has a value which is a string
-	version has a value which is a string
-	source has a value which is a string
-	domain has a value which is a string
-bool is an int
-SolrGenomeFeatureData is a reference to a hash where the following keys are defined:
-	genome_feature_id has a value which is a string
-	genome_id has a value which is a string
-	feature_id has a value which is a string
-	ws_ref has a value which is a string
-	feature_type has a value which is a string
-	aliases has a value which is a string
-	scientific_name has a value which is a string
-	domain has a value which is a string
-	functions has a value which is a string
-	genome_source has a value which is a string
-	go_ontology_description has a value which is a string
-	go_ontology_domain has a value which is a string
-	gene_name has a value which is a string
-	object_name has a value which is a string
-	location_contig has a value which is a string
-	location_strand has a value which is a string
-	taxonomy has a value which is a string
-	workspace_name has a value which is a string
-	genetic_code has a value which is a string
-	md5 has a value which is a string
-	tax_id has a value which is a string
-	assembly_ref has a value which is a string
-	taxonomy_ref has a value which is a string
-	ontology_namespaces has a value which is a string
-	ontology_ids has a value which is a string
-	ontology_names has a value which is a string
-	ontology_lineages has a value which is a string
-	dna_sequence_length has a value which is an int
-	genome_dna_size has a value which is an int
-	location_begin has a value which is an int
-	location_end has a value which is an int
-	num_cds has a value which is an int
-	num_contigs has a value which is an int
-	protein_translation_length has a value which is an int
-	gc_content has a value which is a float
-	complete has a value which is a KBSolrUtil.bool
-	refseq_category has a value which is a string
-	save_date has a value which is a string
+$params is a KBSolrUtil.IndexInSolrParams
+$output is an int
+IndexInSolrParams is a reference to a hash where the following keys are defined:
+	search_core has a value which is a string
+	doc_data has a value which is a reference to a list where each element is a KBSolrUtil.docdata
+docdata is a reference to a hash where the key is a string and the value is a string
 
 
 =end text
 
 =item Description
 
-Index specified genomes in SOLR from KBase workspace
+The index_in_solr function that returns 1 if succeeded otherwise 0
 
 =back
 
 =cut
 
- sub index_genomes_in_solr
+ sub index_in_solr
 {
     my($self, @args) = @_;
 
@@ -261,7 +161,7 @@ Index specified genomes in SOLR from KBase workspace
     if ((my $n = @args) != 1)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
-							       "Invalid argument count for function index_genomes_in_solr (received $n, expecting 1)");
+							       "Invalid argument count for function index_in_solr (received $n, expecting 1)");
     }
     {
 	my($params) = @args;
@@ -269,40 +169,40 @@ Index specified genomes in SOLR from KBase workspace
 	my @_bad_arguments;
         (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument 1 \"params\" (value was \"$params\")");
         if (@_bad_arguments) {
-	    my $msg = "Invalid arguments passed to index_genomes_in_solr:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    my $msg = "Invalid arguments passed to index_in_solr:\n" . join("", map { "\t$_\n" } @_bad_arguments);
 	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-								   method_name => 'index_genomes_in_solr');
+								   method_name => 'index_in_solr');
 	}
     }
 
     my $url = $self->{url};
     my $result = $self->{client}->call($url, $self->{headers}, {
-	    method => "KBSolrUtil.index_genomes_in_solr",
+	    method => "KBSolrUtil.index_in_solr",
 	    params => \@args,
     });
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
 					       code => $result->content->{error}->{code},
-					       method_name => 'index_genomes_in_solr',
+					       method_name => 'index_in_solr',
 					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
 	}
     } else {
-        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method index_genomes_in_solr",
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method index_in_solr",
 					    status_line => $self->{client}->status_line,
-					    method_name => 'index_genomes_in_solr',
+					    method_name => 'index_in_solr',
 				       );
     }
 }
  
 
 
-=head2 list_solr_genomes
+=head2 search_solr
 
-  $output = $obj->list_solr_genomes($params)
+  $output = $obj->search_solr($params)
 
 =over 4
 
@@ -311,53 +211,16 @@ Index specified genomes in SOLR from KBase workspace
 =begin html
 
 <pre>
-$params is a KBSolrUtil.ListSolrDocsParams
-$output is a reference to a list where each element is a KBSolrUtil.SolrGenomeFeatureData
-ListSolrDocsParams is a reference to a hash where the following keys are defined:
-	solr_core has a value which is a string
-	row_start has a value which is an int
-	row_count has a value which is an int
-	create_report has a value which is a KBSolrUtil.bool
-bool is an int
-SolrGenomeFeatureData is a reference to a hash where the following keys are defined:
-	genome_feature_id has a value which is a string
-	genome_id has a value which is a string
-	feature_id has a value which is a string
-	ws_ref has a value which is a string
-	feature_type has a value which is a string
-	aliases has a value which is a string
-	scientific_name has a value which is a string
-	domain has a value which is a string
-	functions has a value which is a string
-	genome_source has a value which is a string
-	go_ontology_description has a value which is a string
-	go_ontology_domain has a value which is a string
-	gene_name has a value which is a string
-	object_name has a value which is a string
-	location_contig has a value which is a string
-	location_strand has a value which is a string
-	taxonomy has a value which is a string
-	workspace_name has a value which is a string
-	genetic_code has a value which is a string
-	md5 has a value which is a string
-	tax_id has a value which is a string
-	assembly_ref has a value which is a string
-	taxonomy_ref has a value which is a string
-	ontology_namespaces has a value which is a string
-	ontology_ids has a value which is a string
-	ontology_names has a value which is a string
-	ontology_lineages has a value which is a string
-	dna_sequence_length has a value which is an int
-	genome_dna_size has a value which is an int
-	location_begin has a value which is an int
-	location_end has a value which is an int
-	num_cds has a value which is an int
-	num_contigs has a value which is an int
-	protein_translation_length has a value which is an int
-	gc_content has a value which is a float
-	complete has a value which is a KBSolrUtil.bool
-	refseq_category has a value which is a string
-	save_date has a value which is a string
+$params is a KBSolrUtil.SearchSolrParams
+$output is a KBSolrUtil.solrresponse
+SearchSolrParams is a reference to a hash where the following keys are defined:
+	search_core has a value which is a string
+	search_param has a value which is a KBSolrUtil.searchdata
+	search_query has a value which is a KBSolrUtil.searchdata
+	result_format has a value which is a string
+	group_option has a value which is a string
+searchdata is a reference to a hash where the key is a string and the value is a string
+solrresponse is a reference to a hash where the key is a string and the value is a string
 
 </pre>
 
@@ -365,66 +228,29 @@ SolrGenomeFeatureData is a reference to a hash where the following keys are defi
 
 =begin text
 
-$params is a KBSolrUtil.ListSolrDocsParams
-$output is a reference to a list where each element is a KBSolrUtil.SolrGenomeFeatureData
-ListSolrDocsParams is a reference to a hash where the following keys are defined:
-	solr_core has a value which is a string
-	row_start has a value which is an int
-	row_count has a value which is an int
-	create_report has a value which is a KBSolrUtil.bool
-bool is an int
-SolrGenomeFeatureData is a reference to a hash where the following keys are defined:
-	genome_feature_id has a value which is a string
-	genome_id has a value which is a string
-	feature_id has a value which is a string
-	ws_ref has a value which is a string
-	feature_type has a value which is a string
-	aliases has a value which is a string
-	scientific_name has a value which is a string
-	domain has a value which is a string
-	functions has a value which is a string
-	genome_source has a value which is a string
-	go_ontology_description has a value which is a string
-	go_ontology_domain has a value which is a string
-	gene_name has a value which is a string
-	object_name has a value which is a string
-	location_contig has a value which is a string
-	location_strand has a value which is a string
-	taxonomy has a value which is a string
-	workspace_name has a value which is a string
-	genetic_code has a value which is a string
-	md5 has a value which is a string
-	tax_id has a value which is a string
-	assembly_ref has a value which is a string
-	taxonomy_ref has a value which is a string
-	ontology_namespaces has a value which is a string
-	ontology_ids has a value which is a string
-	ontology_names has a value which is a string
-	ontology_lineages has a value which is a string
-	dna_sequence_length has a value which is an int
-	genome_dna_size has a value which is an int
-	location_begin has a value which is an int
-	location_end has a value which is an int
-	num_cds has a value which is an int
-	num_contigs has a value which is an int
-	protein_translation_length has a value which is an int
-	gc_content has a value which is a float
-	complete has a value which is a KBSolrUtil.bool
-	refseq_category has a value which is a string
-	save_date has a value which is a string
+$params is a KBSolrUtil.SearchSolrParams
+$output is a KBSolrUtil.solrresponse
+SearchSolrParams is a reference to a hash where the following keys are defined:
+	search_core has a value which is a string
+	search_param has a value which is a KBSolrUtil.searchdata
+	search_query has a value which is a KBSolrUtil.searchdata
+	result_format has a value which is a string
+	group_option has a value which is a string
+searchdata is a reference to a hash where the key is a string and the value is a string
+solrresponse is a reference to a hash where the key is a string and the value is a string
 
 
 =end text
 
 =item Description
 
-Lists genomes indexed in SOLR
+The search_solr function that returns a solrresponse consisting of a string in the format of the specified 'result_format' in SearchSolrParams
 
 =back
 
 =cut
 
- sub list_solr_genomes
+ sub search_solr
 {
     my($self, @args) = @_;
 
@@ -433,7 +259,7 @@ Lists genomes indexed in SOLR
     if ((my $n = @args) != 1)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
-							       "Invalid argument count for function list_solr_genomes (received $n, expecting 1)");
+							       "Invalid argument count for function search_solr (received $n, expecting 1)");
     }
     {
 	my($params) = @args;
@@ -441,174 +267,40 @@ Lists genomes indexed in SOLR
 	my @_bad_arguments;
         (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument 1 \"params\" (value was \"$params\")");
         if (@_bad_arguments) {
-	    my $msg = "Invalid arguments passed to list_solr_genomes:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    my $msg = "Invalid arguments passed to search_solr:\n" . join("", map { "\t$_\n" } @_bad_arguments);
 	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-								   method_name => 'list_solr_genomes');
+								   method_name => 'search_solr');
 	}
     }
 
     my $url = $self->{url};
     my $result = $self->{client}->call($url, $self->{headers}, {
-	    method => "KBSolrUtil.list_solr_genomes",
+	    method => "KBSolrUtil.search_solr",
 	    params => \@args,
     });
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
 					       code => $result->content->{error}->{code},
-					       method_name => 'list_solr_genomes',
+					       method_name => 'search_solr',
 					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
 	}
     } else {
-        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method list_solr_genomes",
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method search_solr",
 					    status_line => $self->{client}->status_line,
-					    method_name => 'list_solr_genomes',
+					    method_name => 'search_solr',
 				       );
     }
 }
  
 
 
-=head2 list_solr_taxa
+=head2 search_solr_wildcard
 
-  $output = $obj->list_solr_taxa($params)
-
-=over 4
-
-=item Parameter and return types
-
-=begin html
-
-<pre>
-$params is a KBSolrUtil.ListSolrDocsParams
-$output is a reference to a list where each element is a KBSolrUtil.SolrTaxonData
-ListSolrDocsParams is a reference to a hash where the following keys are defined:
-	solr_core has a value which is a string
-	row_start has a value which is an int
-	row_count has a value which is an int
-	create_report has a value which is a KBSolrUtil.bool
-bool is an int
-SolrTaxonData is a reference to a hash where the following keys are defined:
-	taxonomy_id has a value which is an int
-	scientific_name has a value which is a string
-	scientific_lineage has a value which is a string
-	rank has a value which is a string
-	kingdom has a value which is a string
-	domain has a value which is a string
-	ws_ref has a value which is a string
-	aliases has a value which is a reference to a list where each element is a string
-	genetic_code has a value which is an int
-	parent_taxon_ref has a value which is a string
-	embl_code has a value which is a string
-	inherited_div_flag has a value which is an int
-	inherited_GC_flag has a value which is an int
-	mitochondrial_genetic_code has a value which is an int
-	inherited_MGC_flag has a value which is an int
-	GenBank_hidden_flag has a value which is an int
-	hidden_subtree_flag has a value which is an int
-	division_id has a value which is an int
-	comments has a value which is a string
-
-</pre>
-
-=end html
-
-=begin text
-
-$params is a KBSolrUtil.ListSolrDocsParams
-$output is a reference to a list where each element is a KBSolrUtil.SolrTaxonData
-ListSolrDocsParams is a reference to a hash where the following keys are defined:
-	solr_core has a value which is a string
-	row_start has a value which is an int
-	row_count has a value which is an int
-	create_report has a value which is a KBSolrUtil.bool
-bool is an int
-SolrTaxonData is a reference to a hash where the following keys are defined:
-	taxonomy_id has a value which is an int
-	scientific_name has a value which is a string
-	scientific_lineage has a value which is a string
-	rank has a value which is a string
-	kingdom has a value which is a string
-	domain has a value which is a string
-	ws_ref has a value which is a string
-	aliases has a value which is a reference to a list where each element is a string
-	genetic_code has a value which is an int
-	parent_taxon_ref has a value which is a string
-	embl_code has a value which is a string
-	inherited_div_flag has a value which is an int
-	inherited_GC_flag has a value which is an int
-	mitochondrial_genetic_code has a value which is an int
-	inherited_MGC_flag has a value which is an int
-	GenBank_hidden_flag has a value which is an int
-	hidden_subtree_flag has a value which is an int
-	division_id has a value which is an int
-	comments has a value which is a string
-
-
-=end text
-
-=item Description
-
-Lists taxa indexed in SOLR
-
-=back
-
-=cut
-
- sub list_solr_taxa
-{
-    my($self, @args) = @_;
-
-# Authentication: required
-
-    if ((my $n = @args) != 1)
-    {
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
-							       "Invalid argument count for function list_solr_taxa (received $n, expecting 1)");
-    }
-    {
-	my($params) = @args;
-
-	my @_bad_arguments;
-        (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument 1 \"params\" (value was \"$params\")");
-        if (@_bad_arguments) {
-	    my $msg = "Invalid arguments passed to list_solr_taxa:\n" . join("", map { "\t$_\n" } @_bad_arguments);
-	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-								   method_name => 'list_solr_taxa');
-	}
-    }
-
-    my $url = $self->{url};
-    my $result = $self->{client}->call($url, $self->{headers}, {
-	    method => "KBSolrUtil.list_solr_taxa",
-	    params => \@args,
-    });
-    if ($result) {
-	if ($result->is_error) {
-	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{error}->{code},
-					       method_name => 'list_solr_taxa',
-					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
-					      );
-	} else {
-	    return wantarray ? @{$result->result} : $result->result->[0];
-	}
-    } else {
-        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method list_solr_taxa",
-					    status_line => $self->{client}->status_line,
-					    method_name => 'list_solr_taxa',
-				       );
-    }
-}
- 
-
-
-=head2 index_taxa_in_solr
-
-  $output = $obj->index_taxa_in_solr($params)
+  $output = $obj->search_solr_wildcard($params)
 
 =over 4
 
@@ -617,55 +309,16 @@ Lists taxa indexed in SOLR
 =begin html
 
 <pre>
-$params is a KBSolrUtil.IndexTaxaInSolrParams
-$output is a reference to a list where each element is a KBSolrUtil.SolrTaxonData
-IndexTaxaInSolrParams is a reference to a hash where the following keys are defined:
-	taxa has a value which is a reference to a list where each element is a KBSolrUtil.LoadedReferenceTaxonData
-	solr_core has a value which is a string
-	create_report has a value which is a KBSolrUtil.bool
-LoadedReferenceTaxonData is a reference to a hash where the following keys are defined:
-	taxon has a value which is a KBSolrUtil.KBaseReferenceTaxonData
-	ws_ref has a value which is a string
-KBaseReferenceTaxonData is a reference to a hash where the following keys are defined:
-	taxonomy_id has a value which is an int
-	scientific_name has a value which is a string
-	scientific_lineage has a value which is a string
-	rank has a value which is a string
-	kingdom has a value which is a string
-	domain has a value which is a string
-	aliases has a value which is a reference to a list where each element is a string
-	genetic_code has a value which is an int
-	parent_taxon_ref has a value which is a string
-	embl_code has a value which is a string
-	inherited_div_flag has a value which is an int
-	inherited_GC_flag has a value which is an int
-	mitochondrial_genetic_code has a value which is an int
-	inherited_MGC_flag has a value which is an int
-	GenBank_hidden_flag has a value which is an int
-	hidden_subtree_flag has a value which is an int
-	division_id has a value which is an int
-	comments has a value which is a string
-bool is an int
-SolrTaxonData is a reference to a hash where the following keys are defined:
-	taxonomy_id has a value which is an int
-	scientific_name has a value which is a string
-	scientific_lineage has a value which is a string
-	rank has a value which is a string
-	kingdom has a value which is a string
-	domain has a value which is a string
-	ws_ref has a value which is a string
-	aliases has a value which is a reference to a list where each element is a string
-	genetic_code has a value which is an int
-	parent_taxon_ref has a value which is a string
-	embl_code has a value which is a string
-	inherited_div_flag has a value which is an int
-	inherited_GC_flag has a value which is an int
-	mitochondrial_genetic_code has a value which is an int
-	inherited_MGC_flag has a value which is an int
-	GenBank_hidden_flag has a value which is an int
-	hidden_subtree_flag has a value which is an int
-	division_id has a value which is an int
-	comments has a value which is a string
+$params is a KBSolrUtil.SearchSolrParams
+$output is a KBSolrUtil.solrresponse
+SearchSolrParams is a reference to a hash where the following keys are defined:
+	search_core has a value which is a string
+	search_param has a value which is a KBSolrUtil.searchdata
+	search_query has a value which is a KBSolrUtil.searchdata
+	result_format has a value which is a string
+	group_option has a value which is a string
+searchdata is a reference to a hash where the key is a string and the value is a string
+solrresponse is a reference to a hash where the key is a string and the value is a string
 
 </pre>
 
@@ -673,68 +326,35 @@ SolrTaxonData is a reference to a hash where the following keys are defined:
 
 =begin text
 
-$params is a KBSolrUtil.IndexTaxaInSolrParams
-$output is a reference to a list where each element is a KBSolrUtil.SolrTaxonData
-IndexTaxaInSolrParams is a reference to a hash where the following keys are defined:
-	taxa has a value which is a reference to a list where each element is a KBSolrUtil.LoadedReferenceTaxonData
-	solr_core has a value which is a string
-	create_report has a value which is a KBSolrUtil.bool
-LoadedReferenceTaxonData is a reference to a hash where the following keys are defined:
-	taxon has a value which is a KBSolrUtil.KBaseReferenceTaxonData
-	ws_ref has a value which is a string
-KBaseReferenceTaxonData is a reference to a hash where the following keys are defined:
-	taxonomy_id has a value which is an int
-	scientific_name has a value which is a string
-	scientific_lineage has a value which is a string
-	rank has a value which is a string
-	kingdom has a value which is a string
-	domain has a value which is a string
-	aliases has a value which is a reference to a list where each element is a string
-	genetic_code has a value which is an int
-	parent_taxon_ref has a value which is a string
-	embl_code has a value which is a string
-	inherited_div_flag has a value which is an int
-	inherited_GC_flag has a value which is an int
-	mitochondrial_genetic_code has a value which is an int
-	inherited_MGC_flag has a value which is an int
-	GenBank_hidden_flag has a value which is an int
-	hidden_subtree_flag has a value which is an int
-	division_id has a value which is an int
-	comments has a value which is a string
-bool is an int
-SolrTaxonData is a reference to a hash where the following keys are defined:
-	taxonomy_id has a value which is an int
-	scientific_name has a value which is a string
-	scientific_lineage has a value which is a string
-	rank has a value which is a string
-	kingdom has a value which is a string
-	domain has a value which is a string
-	ws_ref has a value which is a string
-	aliases has a value which is a reference to a list where each element is a string
-	genetic_code has a value which is an int
-	parent_taxon_ref has a value which is a string
-	embl_code has a value which is a string
-	inherited_div_flag has a value which is an int
-	inherited_GC_flag has a value which is an int
-	mitochondrial_genetic_code has a value which is an int
-	inherited_MGC_flag has a value which is an int
-	GenBank_hidden_flag has a value which is an int
-	hidden_subtree_flag has a value which is an int
-	division_id has a value which is an int
-	comments has a value which is a string
+$params is a KBSolrUtil.SearchSolrParams
+$output is a KBSolrUtil.solrresponse
+SearchSolrParams is a reference to a hash where the following keys are defined:
+	search_core has a value which is a string
+	search_param has a value which is a KBSolrUtil.searchdata
+	search_query has a value which is a KBSolrUtil.searchdata
+	result_format has a value which is a string
+	group_option has a value which is a string
+searchdata is a reference to a hash where the key is a string and the value is a string
+solrresponse is a reference to a hash where the key is a string and the value is a string
 
 
 =end text
 
 =item Description
 
-Index specified genomes in SOLR from KBase workspace
+The search_solr_wildcard function that is a modified version of the above function, all because the stupid SOLR 4.*
+handles the wildcard search string in a weird way:when the '*' is at either end of the search string, it returns 0 docs
+if the search string is within double quotes. On the other hand, when a search string has whitespace(s), it has to be 
+inide double quotes otherwise SOLR will treat it as new field(s).
+So this method will call the method that builds the search string WITHOUT the double quotes ONLY for the use case when 
+'*' will be at the ends of the string.
+The rest is the same as the above method.
 
 =back
 
 =cut
 
- sub index_taxa_in_solr
+ sub search_solr_wildcard
 {
     my($self, @args) = @_;
 
@@ -743,7 +363,7 @@ Index specified genomes in SOLR from KBase workspace
     if ((my $n = @args) != 1)
     {
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
-							       "Invalid argument count for function index_taxa_in_solr (received $n, expecting 1)");
+							       "Invalid argument count for function search_solr_wildcard (received $n, expecting 1)");
     }
     {
 	my($params) = @args;
@@ -751,31 +371,31 @@ Index specified genomes in SOLR from KBase workspace
 	my @_bad_arguments;
         (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument 1 \"params\" (value was \"$params\")");
         if (@_bad_arguments) {
-	    my $msg = "Invalid arguments passed to index_taxa_in_solr:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	    my $msg = "Invalid arguments passed to search_solr_wildcard:\n" . join("", map { "\t$_\n" } @_bad_arguments);
 	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-								   method_name => 'index_taxa_in_solr');
+								   method_name => 'search_solr_wildcard');
 	}
     }
 
     my $url = $self->{url};
     my $result = $self->{client}->call($url, $self->{headers}, {
-	    method => "KBSolrUtil.index_taxa_in_solr",
+	    method => "KBSolrUtil.search_solr_wildcard",
 	    params => \@args,
     });
     if ($result) {
 	if ($result->is_error) {
 	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
 					       code => $result->content->{error}->{code},
-					       method_name => 'index_taxa_in_solr',
+					       method_name => 'search_solr_wildcard',
 					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
 					      );
 	} else {
 	    return wantarray ? @{$result->result} : $result->result->[0];
 	}
     } else {
-        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method index_taxa_in_solr",
+        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method search_solr_wildcard",
 					    status_line => $self->{client}->status_line,
-					    method_name => 'index_taxa_in_solr',
+					    method_name => 'search_solr_wildcard',
 				       );
     }
 }
@@ -823,16 +443,16 @@ sub version {
             Bio::KBase::Exceptions::JSONRPC->throw(
                 error => $result->error_message,
                 code => $result->content->{code},
-                method_name => 'index_taxa_in_solr',
+                method_name => 'search_solr_wildcard',
             );
         } else {
             return wantarray ? @{$result->result} : $result->result->[0];
         }
     } else {
         Bio::KBase::Exceptions::HTTP->throw(
-            error => "Error invoking method index_taxa_in_solr",
+            error => "Error invoking method search_solr_wildcard",
             status_line => $self->{client}->status_line,
-            method_name => 'index_taxa_in_solr',
+            method_name => 'search_solr_wildcard',
         );
     }
 }
@@ -877,7 +497,7 @@ sub _validate_version {
 
 =item Description
 
-A boolean.
+a bool defined as int
 
 
 =item Definition
@@ -900,7 +520,7 @@ an int
 
 
 
-=head2 SolrGenomeFeatureData
+=head2 searchdata
 
 =over 4
 
@@ -908,7 +528,100 @@ an int
 
 =item Description
 
-Struct containing data for a single genome element output by the list_solr_genomes and index_genomes_in_solr functions
+User provided parameter data.
+Arbitrary key-value pairs provided by the user.
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the key is a string and the value is a string
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the key is a string and the value is a string
+
+=end text
+
+=back
+
+
+
+=head2 docdata
+
+=over 4
+
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the key is a string and the value is a string
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the key is a string and the value is a string
+
+=end text
+
+=back
+
+
+
+=head2 solrresponse
+
+=over 4
+
+
+
+=item Description
+
+Solr response data for search requests.
+Arbitrary key-value pairs returned by the solr.
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the key is a string and the value is a string
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the key is a string and the value is a string
+
+=end text
+
+=back
+
+
+
+=head2 IndexInSolrParams
+
+=over 4
+
+
+
+=item Description
+
+Arguments for the index_in_solr function - send doc data to solr for indexing
+
+string search_core - the name of the solr core to index to
+list<docdata> doc_data - the doc to be indexed, a list of hashes
 
 
 =item Definition
@@ -917,44 +630,8 @@ Struct containing data for a single genome element output by the list_solr_genom
 
 <pre>
 a reference to a hash where the following keys are defined:
-genome_feature_id has a value which is a string
-genome_id has a value which is a string
-feature_id has a value which is a string
-ws_ref has a value which is a string
-feature_type has a value which is a string
-aliases has a value which is a string
-scientific_name has a value which is a string
-domain has a value which is a string
-functions has a value which is a string
-genome_source has a value which is a string
-go_ontology_description has a value which is a string
-go_ontology_domain has a value which is a string
-gene_name has a value which is a string
-object_name has a value which is a string
-location_contig has a value which is a string
-location_strand has a value which is a string
-taxonomy has a value which is a string
-workspace_name has a value which is a string
-genetic_code has a value which is a string
-md5 has a value which is a string
-tax_id has a value which is a string
-assembly_ref has a value which is a string
-taxonomy_ref has a value which is a string
-ontology_namespaces has a value which is a string
-ontology_ids has a value which is a string
-ontology_names has a value which is a string
-ontology_lineages has a value which is a string
-dna_sequence_length has a value which is an int
-genome_dna_size has a value which is an int
-location_begin has a value which is an int
-location_end has a value which is an int
-num_cds has a value which is an int
-num_contigs has a value which is an int
-protein_translation_length has a value which is an int
-gc_content has a value which is a float
-complete has a value which is a KBSolrUtil.bool
-refseq_category has a value which is a string
-save_date has a value which is a string
+search_core has a value which is a string
+doc_data has a value which is a reference to a list where each element is a KBSolrUtil.docdata
 
 </pre>
 
@@ -963,44 +640,8 @@ save_date has a value which is a string
 =begin text
 
 a reference to a hash where the following keys are defined:
-genome_feature_id has a value which is a string
-genome_id has a value which is a string
-feature_id has a value which is a string
-ws_ref has a value which is a string
-feature_type has a value which is a string
-aliases has a value which is a string
-scientific_name has a value which is a string
-domain has a value which is a string
-functions has a value which is a string
-genome_source has a value which is a string
-go_ontology_description has a value which is a string
-go_ontology_domain has a value which is a string
-gene_name has a value which is a string
-object_name has a value which is a string
-location_contig has a value which is a string
-location_strand has a value which is a string
-taxonomy has a value which is a string
-workspace_name has a value which is a string
-genetic_code has a value which is a string
-md5 has a value which is a string
-tax_id has a value which is a string
-assembly_ref has a value which is a string
-taxonomy_ref has a value which is a string
-ontology_namespaces has a value which is a string
-ontology_ids has a value which is a string
-ontology_names has a value which is a string
-ontology_lineages has a value which is a string
-dna_sequence_length has a value which is an int
-genome_dna_size has a value which is an int
-location_begin has a value which is an int
-location_end has a value which is an int
-num_cds has a value which is an int
-num_contigs has a value which is an int
-protein_translation_length has a value which is an int
-gc_content has a value which is a float
-complete has a value which is a KBSolrUtil.bool
-refseq_category has a value which is a string
-save_date has a value which is a string
+search_core has a value which is a string
+doc_data has a value which is a reference to a list where each element is a KBSolrUtil.docdata
 
 
 =end text
@@ -1009,7 +650,7 @@ save_date has a value which is a string
 
 
 
-=head2 KBaseReferenceGenomeData
+=head2 SearchSolrParams
 
 =over 4
 
@@ -1017,7 +658,35 @@ save_date has a value which is a string
 
 =item Description
 
-Structure of a single KBase genome in the input list of genomes of the index_genomes_in_solr function.
+Arguments for the search_solr function - search solr according to the parameters passed and return a string
+
+string search_core - the name of the solr core to be searched
+searchdata search_param - arbitrary user-supplied key-value pairs defining how the search should be conducted, 
+        a hash, see the example below:
+        search_param={
+                fl => 'object_id,gene_name,genome_source',
+                wt => 'json',
+                rows => 20,
+                sort => 'object_id asc',
+                hl => 'false',
+                start => 0,
+                count => 100
+        }
+
+searchdata search_query - arbitrary user-supplied key-value pairs defining the fields to be searched and their values 
+                        to be matched, a hash which specifies how the documents will be searched, see the example below:
+        search_query={
+                parent_taxon_ref => '1779/116411/1',
+                rank => 'species',
+                scientific_lineage => 'cellular organisms; Bacteria; Proteobacteria; Alphaproteobacteria; Rhizobiales; Bradyrhizobiaceae; Bradyrhizobium',
+                scientific_name => 'Bradyrhizobium sp. rp3',
+                domain => 'Bacteria'
+        }
+OR, simply:
+        search_query= { q => "*" };
+
+string result_format - the format of the search result, 'xml' as the default, can be 'json', 'csv', etc.
+string group_option - the name of the field to be grouped for the result
 
 
 =item Definition
@@ -1026,15 +695,11 @@ Structure of a single KBase genome in the input list of genomes of the index_gen
 
 <pre>
 a reference to a hash where the following keys are defined:
-ref has a value which is a string
-id has a value which is a string
-workspace_name has a value which is a string
-source_id has a value which is a string
-accession has a value which is a string
-name has a value which is a string
-version has a value which is a string
-source has a value which is a string
-domain has a value which is a string
+search_core has a value which is a string
+search_param has a value which is a KBSolrUtil.searchdata
+search_query has a value which is a KBSolrUtil.searchdata
+result_format has a value which is a string
+group_option has a value which is a string
 
 </pre>
 
@@ -1043,311 +708,11 @@ domain has a value which is a string
 =begin text
 
 a reference to a hash where the following keys are defined:
-ref has a value which is a string
-id has a value which is a string
-workspace_name has a value which is a string
-source_id has a value which is a string
-accession has a value which is a string
-name has a value which is a string
-version has a value which is a string
-source has a value which is a string
-domain has a value which is a string
-
-
-=end text
-
-=back
-
-
-
-=head2 IndexGenomesInSolrParams
-
-=over 4
-
-
-
-=item Description
-
-Arguments for the index_genomes_in_solr function
-
-
-=item Definition
-
-=begin html
-
-<pre>
-a reference to a hash where the following keys are defined:
-genomes has a value which is a reference to a list where each element is a KBSolrUtil.KBaseReferenceGenomeData
-solr_core has a value which is a string
-create_report has a value which is a KBSolrUtil.bool
-
-</pre>
-
-=end html
-
-=begin text
-
-a reference to a hash where the following keys are defined:
-genomes has a value which is a reference to a list where each element is a KBSolrUtil.KBaseReferenceGenomeData
-solr_core has a value which is a string
-create_report has a value which is a KBSolrUtil.bool
-
-
-=end text
-
-=back
-
-
-
-=head2 ListSolrDocsParams
-
-=over 4
-
-
-
-=item Description
-
-Arguments for the list_solr_genomes and list_solr_taxa functions
-
-
-=item Definition
-
-=begin html
-
-<pre>
-a reference to a hash where the following keys are defined:
-solr_core has a value which is a string
-row_start has a value which is an int
-row_count has a value which is an int
-create_report has a value which is a KBSolrUtil.bool
-
-</pre>
-
-=end html
-
-=begin text
-
-a reference to a hash where the following keys are defined:
-solr_core has a value which is a string
-row_start has a value which is an int
-row_count has a value which is an int
-create_report has a value which is a KBSolrUtil.bool
-
-
-=end text
-
-=back
-
-
-
-=head2 SolrTaxonData
-
-=over 4
-
-
-
-=item Description
-
-Struct containing data for a single taxon element output by the list_solr_taxa function
-
-
-=item Definition
-
-=begin html
-
-<pre>
-a reference to a hash where the following keys are defined:
-taxonomy_id has a value which is an int
-scientific_name has a value which is a string
-scientific_lineage has a value which is a string
-rank has a value which is a string
-kingdom has a value which is a string
-domain has a value which is a string
-ws_ref has a value which is a string
-aliases has a value which is a reference to a list where each element is a string
-genetic_code has a value which is an int
-parent_taxon_ref has a value which is a string
-embl_code has a value which is a string
-inherited_div_flag has a value which is an int
-inherited_GC_flag has a value which is an int
-mitochondrial_genetic_code has a value which is an int
-inherited_MGC_flag has a value which is an int
-GenBank_hidden_flag has a value which is an int
-hidden_subtree_flag has a value which is an int
-division_id has a value which is an int
-comments has a value which is a string
-
-</pre>
-
-=end html
-
-=begin text
-
-a reference to a hash where the following keys are defined:
-taxonomy_id has a value which is an int
-scientific_name has a value which is a string
-scientific_lineage has a value which is a string
-rank has a value which is a string
-kingdom has a value which is a string
-domain has a value which is a string
-ws_ref has a value which is a string
-aliases has a value which is a reference to a list where each element is a string
-genetic_code has a value which is an int
-parent_taxon_ref has a value which is a string
-embl_code has a value which is a string
-inherited_div_flag has a value which is an int
-inherited_GC_flag has a value which is an int
-mitochondrial_genetic_code has a value which is an int
-inherited_MGC_flag has a value which is an int
-GenBank_hidden_flag has a value which is an int
-hidden_subtree_flag has a value which is an int
-division_id has a value which is an int
-comments has a value which is a string
-
-
-=end text
-
-=back
-
-
-
-=head2 KBaseReferenceTaxonData
-
-=over 4
-
-
-
-=item Description
-
-Struct containing data for a single taxon element output by the list_loaded_taxa function
-
-
-=item Definition
-
-=begin html
-
-<pre>
-a reference to a hash where the following keys are defined:
-taxonomy_id has a value which is an int
-scientific_name has a value which is a string
-scientific_lineage has a value which is a string
-rank has a value which is a string
-kingdom has a value which is a string
-domain has a value which is a string
-aliases has a value which is a reference to a list where each element is a string
-genetic_code has a value which is an int
-parent_taxon_ref has a value which is a string
-embl_code has a value which is a string
-inherited_div_flag has a value which is an int
-inherited_GC_flag has a value which is an int
-mitochondrial_genetic_code has a value which is an int
-inherited_MGC_flag has a value which is an int
-GenBank_hidden_flag has a value which is an int
-hidden_subtree_flag has a value which is an int
-division_id has a value which is an int
-comments has a value which is a string
-
-</pre>
-
-=end html
-
-=begin text
-
-a reference to a hash where the following keys are defined:
-taxonomy_id has a value which is an int
-scientific_name has a value which is a string
-scientific_lineage has a value which is a string
-rank has a value which is a string
-kingdom has a value which is a string
-domain has a value which is a string
-aliases has a value which is a reference to a list where each element is a string
-genetic_code has a value which is an int
-parent_taxon_ref has a value which is a string
-embl_code has a value which is a string
-inherited_div_flag has a value which is an int
-inherited_GC_flag has a value which is an int
-mitochondrial_genetic_code has a value which is an int
-inherited_MGC_flag has a value which is an int
-GenBank_hidden_flag has a value which is an int
-hidden_subtree_flag has a value which is an int
-division_id has a value which is an int
-comments has a value which is a string
-
-
-=end text
-
-=back
-
-
-
-=head2 LoadedReferenceTaxonData
-
-=over 4
-
-
-
-=item Description
-
-Struct containing data for a single output by the list_loaded_taxa function
-
-
-=item Definition
-
-=begin html
-
-<pre>
-a reference to a hash where the following keys are defined:
-taxon has a value which is a KBSolrUtil.KBaseReferenceTaxonData
-ws_ref has a value which is a string
-
-</pre>
-
-=end html
-
-=begin text
-
-a reference to a hash where the following keys are defined:
-taxon has a value which is a KBSolrUtil.KBaseReferenceTaxonData
-ws_ref has a value which is a string
-
-
-=end text
-
-=back
-
-
-
-=head2 IndexTaxaInSolrParams
-
-=over 4
-
-
-
-=item Description
-
-Arguments for the index_taxa_in_solr function
-
-
-=item Definition
-
-=begin html
-
-<pre>
-a reference to a hash where the following keys are defined:
-taxa has a value which is a reference to a list where each element is a KBSolrUtil.LoadedReferenceTaxonData
-solr_core has a value which is a string
-create_report has a value which is a KBSolrUtil.bool
-
-</pre>
-
-=end html
-
-=begin text
-
-a reference to a hash where the following keys are defined:
-taxa has a value which is a reference to a list where each element is a KBSolrUtil.LoadedReferenceTaxonData
-solr_core has a value which is a string
-create_report has a value which is a KBSolrUtil.bool
+search_core has a value which is a string
+search_param has a value which is a KBSolrUtil.searchdata
+search_query has a value which is a KBSolrUtil.searchdata
+result_format has a value which is a string
+group_option has a value which is a string
 
 
 =end text

@@ -164,74 +164,62 @@ public class KBSolrUtilClient {
     }
 
     /**
-     * <p>Original spec-file function name: index_genomes_in_solr</p>
+     * <p>Original spec-file function name: index_in_solr</p>
      * <pre>
-     * Index specified genomes in SOLR from KBase workspace
+     * The index_in_solr function that returns 1 if succeeded otherwise 0
      * </pre>
-     * @param   params   instance of type {@link us.kbase.kbsolrutil.IndexGenomesInSolrParams IndexGenomesInSolrParams}
-     * @return   parameter "output" of list of type {@link us.kbase.kbsolrutil.SolrGenomeFeatureData SolrGenomeFeatureData}
+     * @param   params   instance of type {@link us.kbase.kbsolrutil.IndexInSolrParams IndexInSolrParams}
+     * @return   parameter "output" of Long
      * @throws IOException if an IO exception occurs
      * @throws JsonClientException if a JSON RPC exception occurs
      */
-    public List<SolrGenomeFeatureData> indexGenomesInSolr(IndexGenomesInSolrParams params, RpcContext... jsonRpcContext) throws IOException, JsonClientException {
+    public Long indexInSolr(IndexInSolrParams params, RpcContext... jsonRpcContext) throws IOException, JsonClientException {
         List<Object> args = new ArrayList<Object>();
         args.add(params);
-        TypeReference<List<List<SolrGenomeFeatureData>>> retType = new TypeReference<List<List<SolrGenomeFeatureData>>>() {};
-        List<List<SolrGenomeFeatureData>> res = caller.jsonrpcCall("KBSolrUtil.index_genomes_in_solr", args, retType, true, true, jsonRpcContext, this.serviceVersion);
+        TypeReference<List<Long>> retType = new TypeReference<List<Long>>() {};
+        List<Long> res = caller.jsonrpcCall("KBSolrUtil.index_in_solr", args, retType, true, true, jsonRpcContext, this.serviceVersion);
         return res.get(0);
     }
 
     /**
-     * <p>Original spec-file function name: list_solr_genomes</p>
+     * <p>Original spec-file function name: search_solr</p>
      * <pre>
-     * Lists genomes indexed in SOLR
+     * The search_solr function that returns a solrresponse consisting of a string in the format of the specified 'result_format' in SearchSolrParams
      * </pre>
-     * @param   params   instance of type {@link us.kbase.kbsolrutil.ListSolrDocsParams ListSolrDocsParams}
-     * @return   parameter "output" of list of type {@link us.kbase.kbsolrutil.SolrGenomeFeatureData SolrGenomeFeatureData}
+     * @param   params   instance of type {@link us.kbase.kbsolrutil.SearchSolrParams SearchSolrParams}
+     * @return   parameter "output" of original type "solrresponse" (Solr response data for search requests. Arbitrary key-value pairs returned by the solr.) &rarr; mapping from String to String
      * @throws IOException if an IO exception occurs
      * @throws JsonClientException if a JSON RPC exception occurs
      */
-    public List<SolrGenomeFeatureData> listSolrGenomes(ListSolrDocsParams params, RpcContext... jsonRpcContext) throws IOException, JsonClientException {
+    public Map<String,String> searchSolr(SearchSolrParams params, RpcContext... jsonRpcContext) throws IOException, JsonClientException {
         List<Object> args = new ArrayList<Object>();
         args.add(params);
-        TypeReference<List<List<SolrGenomeFeatureData>>> retType = new TypeReference<List<List<SolrGenomeFeatureData>>>() {};
-        List<List<SolrGenomeFeatureData>> res = caller.jsonrpcCall("KBSolrUtil.list_solr_genomes", args, retType, true, true, jsonRpcContext, this.serviceVersion);
+        TypeReference<List<Map<String,String>>> retType = new TypeReference<List<Map<String,String>>>() {};
+        List<Map<String,String>> res = caller.jsonrpcCall("KBSolrUtil.search_solr", args, retType, true, true, jsonRpcContext, this.serviceVersion);
         return res.get(0);
     }
 
     /**
-     * <p>Original spec-file function name: list_solr_taxa</p>
+     * <p>Original spec-file function name: search_solr_wildcard</p>
      * <pre>
-     * Lists taxa indexed in SOLR
+     * The search_solr_wildcard function that is a modified version of the above function, all because the stupid SOLR 4.*
+     * handles the wildcard search string in a weird way:when the '*' is at either end of the search string, it returns 0 docs
+     * if the search string is within double quotes. On the other hand, when a search string has whitespace(s), it has to be 
+     * inide double quotes otherwise SOLR will treat it as new field(s).
+     * So this method will call the method that builds the search string WITHOUT the double quotes ONLY for the use case when 
+     * '*' will be at the ends of the string.
+     * The rest is the same as the above method.
      * </pre>
-     * @param   params   instance of type {@link us.kbase.kbsolrutil.ListSolrDocsParams ListSolrDocsParams}
-     * @return   parameter "output" of list of type {@link us.kbase.kbsolrutil.SolrTaxonData SolrTaxonData}
+     * @param   params   instance of type {@link us.kbase.kbsolrutil.SearchSolrParams SearchSolrParams}
+     * @return   parameter "output" of original type "solrresponse" (Solr response data for search requests. Arbitrary key-value pairs returned by the solr.) &rarr; mapping from String to String
      * @throws IOException if an IO exception occurs
      * @throws JsonClientException if a JSON RPC exception occurs
      */
-    public List<SolrTaxonData> listSolrTaxa(ListSolrDocsParams params, RpcContext... jsonRpcContext) throws IOException, JsonClientException {
+    public Map<String,String> searchSolrWildcard(SearchSolrParams params, RpcContext... jsonRpcContext) throws IOException, JsonClientException {
         List<Object> args = new ArrayList<Object>();
         args.add(params);
-        TypeReference<List<List<SolrTaxonData>>> retType = new TypeReference<List<List<SolrTaxonData>>>() {};
-        List<List<SolrTaxonData>> res = caller.jsonrpcCall("KBSolrUtil.list_solr_taxa", args, retType, true, true, jsonRpcContext, this.serviceVersion);
-        return res.get(0);
-    }
-
-    /**
-     * <p>Original spec-file function name: index_taxa_in_solr</p>
-     * <pre>
-     * Index specified genomes in SOLR from KBase workspace
-     * </pre>
-     * @param   params   instance of type {@link us.kbase.kbsolrutil.IndexTaxaInSolrParams IndexTaxaInSolrParams}
-     * @return   parameter "output" of list of type {@link us.kbase.kbsolrutil.SolrTaxonData SolrTaxonData}
-     * @throws IOException if an IO exception occurs
-     * @throws JsonClientException if a JSON RPC exception occurs
-     */
-    public List<SolrTaxonData> indexTaxaInSolr(IndexTaxaInSolrParams params, RpcContext... jsonRpcContext) throws IOException, JsonClientException {
-        List<Object> args = new ArrayList<Object>();
-        args.add(params);
-        TypeReference<List<List<SolrTaxonData>>> retType = new TypeReference<List<List<SolrTaxonData>>>() {};
-        List<List<SolrTaxonData>> res = caller.jsonrpcCall("KBSolrUtil.index_taxa_in_solr", args, retType, true, true, jsonRpcContext, this.serviceVersion);
+        TypeReference<List<Map<String,String>>> retType = new TypeReference<List<Map<String,String>>>() {};
+        List<Map<String,String>> res = caller.jsonrpcCall("KBSolrUtil.search_solr_wildcard", args, retType, true, true, jsonRpcContext, this.serviceVersion);
         return res.get(0);
     }
 

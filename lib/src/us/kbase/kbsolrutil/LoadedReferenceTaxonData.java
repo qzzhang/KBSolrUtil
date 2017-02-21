@@ -14,59 +14,20 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 /**
  * <p>Original spec-file type: LoadedReferenceTaxonData</p>
  * <pre>
- * Struct containing data for a single output by the list_loaded_taxa function
+ * Struct containing data for a single item in the input parameter of index_taxa_in_solr
  * </pre>
  * 
  */
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Generated("com.googlecode.jsonschema2pojo")
 @JsonPropertyOrder({
-    "taxon",
     "ws_ref"
 })
 public class LoadedReferenceTaxonData {
 
-    /**
-     * <p>Original spec-file type: KBaseReferenceTaxonData</p>
-     * <pre>
-     * Struct containing data for a single taxon element output by the list_loaded_taxa function
-     * </pre>
-     * 
-     */
-    @JsonProperty("taxon")
-    private KBaseReferenceTaxonData taxon;
     @JsonProperty("ws_ref")
     private String wsRef;
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
-
-    /**
-     * <p>Original spec-file type: KBaseReferenceTaxonData</p>
-     * <pre>
-     * Struct containing data for a single taxon element output by the list_loaded_taxa function
-     * </pre>
-     * 
-     */
-    @JsonProperty("taxon")
-    public KBaseReferenceTaxonData getTaxon() {
-        return taxon;
-    }
-
-    /**
-     * <p>Original spec-file type: KBaseReferenceTaxonData</p>
-     * <pre>
-     * Struct containing data for a single taxon element output by the list_loaded_taxa function
-     * </pre>
-     * 
-     */
-    @JsonProperty("taxon")
-    public void setTaxon(KBaseReferenceTaxonData taxon) {
-        this.taxon = taxon;
-    }
-
-    public LoadedReferenceTaxonData withTaxon(KBaseReferenceTaxonData taxon) {
-        this.taxon = taxon;
-        return this;
-    }
 
     @JsonProperty("ws_ref")
     public String getWsRef() {
@@ -95,7 +56,7 @@ public class LoadedReferenceTaxonData {
 
     @Override
     public String toString() {
-        return ((((((("LoadedReferenceTaxonData"+" [taxon=")+ taxon)+", wsRef=")+ wsRef)+", additionalProperties=")+ additionalProperties)+"]");
+        return ((((("LoadedReferenceTaxonData"+" [wsRef=")+ wsRef)+", additionalProperties=")+ additionalProperties)+"]");
     }
 
 }

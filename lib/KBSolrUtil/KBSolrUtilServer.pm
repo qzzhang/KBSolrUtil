@@ -28,28 +28,25 @@ has 'local_headers' => (is => 'ro', isa => 'HashRef');
 our $CallContext;
 
 our %return_counts = (
-        'index_genomes_in_solr' => 1,
-        'list_solr_genomes' => 1,
-        'list_solr_taxa' => 1,
-        'index_taxa_in_solr' => 1,
+        'index_in_solr' => 1,
+        'search_solr' => 1,
+        'search_solr_wildcard' => 1,
         'status' => 1,
 );
 
 our %method_authentication = (
-        'index_genomes_in_solr' => 'required',
-        'list_solr_genomes' => 'required',
-        'list_solr_taxa' => 'required',
-        'index_taxa_in_solr' => 'required',
+        'index_in_solr' => 'required',
+        'search_solr' => 'required',
+        'search_solr_wildcard' => 'required',
 );
 
 sub _build_valid_methods
 {
     my($self) = @_;
     my $methods = {
-        'index_genomes_in_solr' => 1,
-        'list_solr_genomes' => 1,
-        'list_solr_taxa' => 1,
-        'index_taxa_in_solr' => 1,
+        'index_in_solr' => 1,
+        'search_solr' => 1,
+        'search_solr_wildcard' => 1,
         'status' => 1,
     };
     return $methods;

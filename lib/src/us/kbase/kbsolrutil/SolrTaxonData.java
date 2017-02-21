@@ -15,7 +15,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 /**
  * <p>Original spec-file type: SolrTaxonData</p>
  * <pre>
- * Struct containing data for a single taxon element output by the list_solr_taxa function
+ * Struct containing data for a single taxon element output by the index_taxa_in_solr function
  * </pre>
  * 
  */

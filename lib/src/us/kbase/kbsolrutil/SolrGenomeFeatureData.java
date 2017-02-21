@@ -14,7 +14,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 /**
  * <p>Original spec-file type: SolrGenomeFeatureData</p>
  * <pre>
- * Struct containing data for a single genome element output by the list_solr_genomes and index_genomes_in_solr functions
+ * Struct containing data for a single genome element output by the index_genomes_in_solr function
  * </pre>
  * 
  */

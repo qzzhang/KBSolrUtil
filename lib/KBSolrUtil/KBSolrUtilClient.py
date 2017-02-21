@@ -33,160 +33,102 @@ class KBSolrUtil(object):
             trust_all_ssl_certificates=trust_all_ssl_certificates,
             auth_svc=auth_svc)
 
-    def index_genomes_in_solr(self, params, context=None):
+    def index_in_solr(self, params, context=None):
         """
-        Index specified genomes in SOLR from KBase workspace
-        :param params: instance of type "IndexGenomesInSolrParams" (Arguments
-           for the index_genomes_in_solr function) -> structure: parameter
-           "genomes" of list of type "KBaseReferenceGenomeData" (Structure of
-           a single KBase genome in the input list of genomes of the
-           index_genomes_in_solr function.) -> structure: parameter "ref" of
-           String, parameter "id" of String, parameter "workspace_name" of
-           String, parameter "source_id" of String, parameter "accession" of
-           String, parameter "name" of String, parameter "version" of String,
-           parameter "source" of String, parameter "domain" of String,
-           parameter "solr_core" of String, parameter "create_report" of type
-           "bool" (A boolean.)
-        :returns: instance of list of type "SolrGenomeFeatureData" (Struct
-           containing data for a single genome element output by the
-           list_solr_genomes and index_genomes_in_solr functions) ->
-           structure: parameter "genome_feature_id" of String, parameter
-           "genome_id" of String, parameter "feature_id" of String, parameter
-           "ws_ref" of String, parameter "feature_type" of String, parameter
-           "aliases" of String, parameter "scientific_name" of String,
-           parameter "domain" of String, parameter "functions" of String,
-           parameter "genome_source" of String, parameter
-           "go_ontology_description" of String, parameter
-           "go_ontology_domain" of String, parameter "gene_name" of String,
-           parameter "object_name" of String, parameter "location_contig" of
-           String, parameter "location_strand" of String, parameter
-           "taxonomy" of String, parameter "workspace_name" of String,
-           parameter "genetic_code" of String, parameter "md5" of String,
-           parameter "tax_id" of String, parameter "assembly_ref" of String,
-           parameter "taxonomy_ref" of String, parameter
-           "ontology_namespaces" of String, parameter "ontology_ids" of
-           String, parameter "ontology_names" of String, parameter
-           "ontology_lineages" of String, parameter "dna_sequence_length" of
-           Long, parameter "genome_dna_size" of Long, parameter
-           "location_begin" of Long, parameter "location_end" of Long,
-           parameter "num_cds" of Long, parameter "num_contigs" of Long,
-           parameter "protein_translation_length" of Long, parameter
-           "gc_content" of Double, parameter "complete" of type "bool" (A
-           boolean.), parameter "refseq_category" of String, parameter
-           "save_date" of String
+        The index_in_solr function that returns 1 if succeeded otherwise 0
+        :param params: instance of type "IndexInSolrParams" (Arguments for
+           the index_in_solr function - send doc data to solr for indexing
+           string search_core - the name of the solr core to index to
+           list<docdata> doc_data - the doc to be indexed, a list of hashes)
+           -> structure: parameter "search_core" of String, parameter
+           "doc_data" of list of type "docdata" -> mapping from String to
+           String
+        :returns: instance of Long
         """
         return self._client.call_method(
-            'KBSolrUtil.index_genomes_in_solr',
+            'KBSolrUtil.index_in_solr',
             [params], self._service_ver, context)
 
-    def list_solr_genomes(self, params, context=None):
+    def search_solr(self, params, context=None):
         """
-        Lists genomes indexed in SOLR
-        :param params: instance of type "ListSolrDocsParams" (Arguments for
-           the list_solr_genomes and list_solr_taxa functions) -> structure:
-           parameter "solr_core" of String, parameter "row_start" of Long,
-           parameter "row_count" of Long, parameter "create_report" of type
-           "bool" (A boolean.)
-        :returns: instance of list of type "SolrGenomeFeatureData" (Struct
-           containing data for a single genome element output by the
-           list_solr_genomes and index_genomes_in_solr functions) ->
-           structure: parameter "genome_feature_id" of String, parameter
-           "genome_id" of String, parameter "feature_id" of String, parameter
-           "ws_ref" of String, parameter "feature_type" of String, parameter
-           "aliases" of String, parameter "scientific_name" of String,
-           parameter "domain" of String, parameter "functions" of String,
-           parameter "genome_source" of String, parameter
-           "go_ontology_description" of String, parameter
-           "go_ontology_domain" of String, parameter "gene_name" of String,
-           parameter "object_name" of String, parameter "location_contig" of
-           String, parameter "location_strand" of String, parameter
-           "taxonomy" of String, parameter "workspace_name" of String,
-           parameter "genetic_code" of String, parameter "md5" of String,
-           parameter "tax_id" of String, parameter "assembly_ref" of String,
-           parameter "taxonomy_ref" of String, parameter
-           "ontology_namespaces" of String, parameter "ontology_ids" of
-           String, parameter "ontology_names" of String, parameter
-           "ontology_lineages" of String, parameter "dna_sequence_length" of
-           Long, parameter "genome_dna_size" of Long, parameter
-           "location_begin" of Long, parameter "location_end" of Long,
-           parameter "num_cds" of Long, parameter "num_contigs" of Long,
-           parameter "protein_translation_length" of Long, parameter
-           "gc_content" of Double, parameter "complete" of type "bool" (A
-           boolean.), parameter "refseq_category" of String, parameter
-           "save_date" of String
+        The search_solr function that returns a solrresponse consisting of a string in the format of the specified 'result_format' in SearchSolrParams
+        :param params: instance of type "SearchSolrParams" (Arguments for the
+           search_solr function - search solr according to the parameters
+           passed and return a string string search_core - the name of the
+           solr core to be searched searchdata search_param - arbitrary
+           user-supplied key-value pairs defining how the search should be
+           conducted, a hash, see the example below: search_param={ fl =>
+           'object_id,gene_name,genome_source', wt => 'json', rows => 20,
+           sort => 'object_id asc', hl => 'false', start => 0, count => 100 }
+           searchdata search_query - arbitrary user-supplied key-value pairs
+           defining the fields to be searched and their values to be matched,
+           a hash which specifies how the documents will be searched, see the
+           example below: search_query={ parent_taxon_ref => '1779/116411/1',
+           rank => 'species', scientific_lineage => 'cellular organisms;
+           Bacteria; Proteobacteria; Alphaproteobacteria; Rhizobiales;
+           Bradyrhizobiaceae; Bradyrhizobium', scientific_name =>
+           'Bradyrhizobium sp. rp3', domain => 'Bacteria' } OR, simply:
+           search_query= { q => "*" }; string result_format - the format of
+           the search result, 'xml' as the default, can be 'json', 'csv',
+           etc. string group_option - the name of the field to be grouped for
+           the result) -> structure: parameter "search_core" of String,
+           parameter "search_param" of type "searchdata" (User provided
+           parameter data. Arbitrary key-value pairs provided by the user.)
+           -> mapping from String to String, parameter "search_query" of type
+           "searchdata" (User provided parameter data. Arbitrary key-value
+           pairs provided by the user.) -> mapping from String to String,
+           parameter "result_format" of String, parameter "group_option" of
+           String
+        :returns: instance of type "solrresponse" (Solr response data for
+           search requests. Arbitrary key-value pairs returned by the solr.)
+           -> mapping from String to String
         """
         return self._client.call_method(
-            'KBSolrUtil.list_solr_genomes',
+            'KBSolrUtil.search_solr',
             [params], self._service_ver, context)
 
-    def list_solr_taxa(self, params, context=None):
+    def search_solr_wildcard(self, params, context=None):
         """
-        Lists taxa indexed in SOLR
-        :param params: instance of type "ListSolrDocsParams" (Arguments for
-           the list_solr_genomes and list_solr_taxa functions) -> structure:
-           parameter "solr_core" of String, parameter "row_start" of Long,
-           parameter "row_count" of Long, parameter "create_report" of type
-           "bool" (A boolean.)
-        :returns: instance of list of type "SolrTaxonData" (Struct containing
-           data for a single taxon element output by the list_solr_taxa
-           function) -> structure: parameter "taxonomy_id" of Long, parameter
-           "scientific_name" of String, parameter "scientific_lineage" of
-           String, parameter "rank" of String, parameter "kingdom" of String,
-           parameter "domain" of String, parameter "ws_ref" of String,
-           parameter "aliases" of list of String, parameter "genetic_code" of
-           Long, parameter "parent_taxon_ref" of String, parameter
-           "embl_code" of String, parameter "inherited_div_flag" of Long,
-           parameter "inherited_GC_flag" of Long, parameter
-           "mitochondrial_genetic_code" of Long, parameter
-           "inherited_MGC_flag" of Long, parameter "GenBank_hidden_flag" of
-           Long, parameter "hidden_subtree_flag" of Long, parameter
-           "division_id" of Long, parameter "comments" of String
-        """
-        return self._client.call_method(
-            'KBSolrUtil.list_solr_taxa',
-            [params], self._service_ver, context)
-
-    def index_taxa_in_solr(self, params, context=None):
-        """
-        Index specified genomes in SOLR from KBase workspace
-        :param params: instance of type "IndexTaxaInSolrParams" (Arguments
-           for the index_taxa_in_solr function) -> structure: parameter
-           "taxa" of list of type "LoadedReferenceTaxonData" (Struct
-           containing data for a single output by the list_loaded_taxa
-           function) -> structure: parameter "taxon" of type
-           "KBaseReferenceTaxonData" (Struct containing data for a single
-           taxon element output by the list_loaded_taxa function) ->
-           structure: parameter "taxonomy_id" of Long, parameter
-           "scientific_name" of String, parameter "scientific_lineage" of
-           String, parameter "rank" of String, parameter "kingdom" of String,
-           parameter "domain" of String, parameter "aliases" of list of
-           String, parameter "genetic_code" of Long, parameter
-           "parent_taxon_ref" of String, parameter "embl_code" of String,
-           parameter "inherited_div_flag" of Long, parameter
-           "inherited_GC_flag" of Long, parameter
-           "mitochondrial_genetic_code" of Long, parameter
-           "inherited_MGC_flag" of Long, parameter "GenBank_hidden_flag" of
-           Long, parameter "hidden_subtree_flag" of Long, parameter
-           "division_id" of Long, parameter "comments" of String, parameter
-           "ws_ref" of String, parameter "solr_core" of String, parameter
-           "create_report" of type "bool" (A boolean.)
-        :returns: instance of list of type "SolrTaxonData" (Struct containing
-           data for a single taxon element output by the list_solr_taxa
-           function) -> structure: parameter "taxonomy_id" of Long, parameter
-           "scientific_name" of String, parameter "scientific_lineage" of
-           String, parameter "rank" of String, parameter "kingdom" of String,
-           parameter "domain" of String, parameter "ws_ref" of String,
-           parameter "aliases" of list of String, parameter "genetic_code" of
-           Long, parameter "parent_taxon_ref" of String, parameter
-           "embl_code" of String, parameter "inherited_div_flag" of Long,
-           parameter "inherited_GC_flag" of Long, parameter
-           "mitochondrial_genetic_code" of Long, parameter
-           "inherited_MGC_flag" of Long, parameter "GenBank_hidden_flag" of
-           Long, parameter "hidden_subtree_flag" of Long, parameter
-           "division_id" of Long, parameter "comments" of String
+        The search_solr_wildcard function that is a modified version of the above function, all because the stupid SOLR 4.*
+        handles the wildcard search string in a weird way:when the '*' is at either end of the search string, it returns 0 docs
+        if the search string is within double quotes. On the other hand, when a search string has whitespace(s), it has to be 
+        inide double quotes otherwise SOLR will treat it as new field(s).
+        So this method will call the method that builds the search string WITHOUT the double quotes ONLY for the use case when 
+        '*' will be at the ends of the string.
+        The rest is the same as the above method.
+        :param params: instance of type "SearchSolrParams" (Arguments for the
+           search_solr function - search solr according to the parameters
+           passed and return a string string search_core - the name of the
+           solr core to be searched searchdata search_param - arbitrary
+           user-supplied key-value pairs defining how the search should be
+           conducted, a hash, see the example below: search_param={ fl =>
+           'object_id,gene_name,genome_source', wt => 'json', rows => 20,
+           sort => 'object_id asc', hl => 'false', start => 0, count => 100 }
+           searchdata search_query - arbitrary user-supplied key-value pairs
+           defining the fields to be searched and their values to be matched,
+           a hash which specifies how the documents will be searched, see the
+           example below: search_query={ parent_taxon_ref => '1779/116411/1',
+           rank => 'species', scientific_lineage => 'cellular organisms;
+           Bacteria; Proteobacteria; Alphaproteobacteria; Rhizobiales;
+           Bradyrhizobiaceae; Bradyrhizobium', scientific_name =>
+           'Bradyrhizobium sp. rp3', domain => 'Bacteria' } OR, simply:
+           search_query= { q => "*" }; string result_format - the format of
+           the search result, 'xml' as the default, can be 'json', 'csv',
+           etc. string group_option - the name of the field to be grouped for
+           the result) -> structure: parameter "search_core" of String,
+           parameter "search_param" of type "searchdata" (User provided
+           parameter data. Arbitrary key-value pairs provided by the user.)
+           -> mapping from String to String, parameter "search_query" of type
+           "searchdata" (User provided parameter data. Arbitrary key-value
+           pairs provided by the user.) -> mapping from String to String,
+           parameter "result_format" of String, parameter "group_option" of
+           String
+        :returns: instance of type "solrresponse" (Solr response data for
+           search requests. Arbitrary key-value pairs returned by the solr.)
+           -> mapping from String to String
         """
         return self._client.call_method(
-            'KBSolrUtil.index_taxa_in_solr',
+            'KBSolrUtil.search_solr_wildcard',
             [params], self._service_ver, context)
 
     def status(self, context=None):
