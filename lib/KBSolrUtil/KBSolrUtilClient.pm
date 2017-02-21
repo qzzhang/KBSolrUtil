@@ -296,110 +296,6 @@ The search_solr function that returns a solrresponse consisting of a string in t
     }
 }
  
-
-
-=head2 search_solr_wildcard
-
-  $output = $obj->search_solr_wildcard($params)
-
-=over 4
-
-=item Parameter and return types
-
-=begin html
-
-<pre>
-$params is a KBSolrUtil.SearchSolrParams
-$output is a KBSolrUtil.solrresponse
-SearchSolrParams is a reference to a hash where the following keys are defined:
-	search_core has a value which is a string
-	search_param has a value which is a KBSolrUtil.searchdata
-	search_query has a value which is a KBSolrUtil.searchdata
-	result_format has a value which is a string
-	group_option has a value which is a string
-searchdata is a reference to a hash where the key is a string and the value is a string
-solrresponse is a reference to a hash where the key is a string and the value is a string
-
-</pre>
-
-=end html
-
-=begin text
-
-$params is a KBSolrUtil.SearchSolrParams
-$output is a KBSolrUtil.solrresponse
-SearchSolrParams is a reference to a hash where the following keys are defined:
-	search_core has a value which is a string
-	search_param has a value which is a KBSolrUtil.searchdata
-	search_query has a value which is a KBSolrUtil.searchdata
-	result_format has a value which is a string
-	group_option has a value which is a string
-searchdata is a reference to a hash where the key is a string and the value is a string
-solrresponse is a reference to a hash where the key is a string and the value is a string
-
-
-=end text
-
-=item Description
-
-The search_solr_wildcard function that is a modified version of the above function, all because the stupid SOLR 4.*
-handles the wildcard search string in a weird way:when the '*' is at either end of the search string, it returns 0 docs
-if the search string is within double quotes. On the other hand, when a search string has whitespace(s), it has to be 
-inide double quotes otherwise SOLR will treat it as new field(s).
-So this method will call the method that builds the search string WITHOUT the double quotes ONLY for the use case when 
-'*' will be at the ends of the string.
-The rest is the same as the above method.
-
-=back
-
-=cut
-
- sub search_solr_wildcard
-{
-    my($self, @args) = @_;
-
-# Authentication: required
-
-    if ((my $n = @args) != 1)
-    {
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error =>
-							       "Invalid argument count for function search_solr_wildcard (received $n, expecting 1)");
-    }
-    {
-	my($params) = @args;
-
-	my @_bad_arguments;
-        (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument 1 \"params\" (value was \"$params\")");
-        if (@_bad_arguments) {
-	    my $msg = "Invalid arguments passed to search_solr_wildcard:\n" . join("", map { "\t$_\n" } @_bad_arguments);
-	    Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-								   method_name => 'search_solr_wildcard');
-	}
-    }
-
-    my $url = $self->{url};
-    my $result = $self->{client}->call($url, $self->{headers}, {
-	    method => "KBSolrUtil.search_solr_wildcard",
-	    params => \@args,
-    });
-    if ($result) {
-	if ($result->is_error) {
-	    Bio::KBase::Exceptions::JSONRPC->throw(error => $result->error_message,
-					       code => $result->content->{error}->{code},
-					       method_name => 'search_solr_wildcard',
-					       data => $result->content->{error}->{error} # JSON::RPC::ReturnObject only supports JSONRPC 1.1 or 1.O
-					      );
-	} else {
-	    return wantarray ? @{$result->result} : $result->result->[0];
-	}
-    } else {
-        Bio::KBase::Exceptions::HTTP->throw(error => "Error invoking method search_solr_wildcard",
-					    status_line => $self->{client}->status_line,
-					    method_name => 'search_solr_wildcard',
-				       );
-    }
-}
- 
   
 sub status
 {
@@ -443,16 +339,16 @@ sub version {
             Bio::KBase::Exceptions::JSONRPC->throw(
                 error => $result->error_message,
                 code => $result->content->{code},
-                method_name => 'search_solr_wildcard',
+                method_name => 'search_solr',
             );
         } else {
             return wantarray ? @{$result->result} : $result->result->[0];
         }
     } else {
         Bio::KBase::Exceptions::HTTP->throw(
-            error => "Error invoking method search_solr_wildcard",
+            error => "Error invoking method search_solr",
             status_line => $self->{client}->status_line,
-            method_name => 'search_solr_wildcard',
+            method_name => 'search_solr',
         );
     }
 }

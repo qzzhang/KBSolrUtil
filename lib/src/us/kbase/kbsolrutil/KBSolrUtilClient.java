@@ -199,30 +199,6 @@ public class KBSolrUtilClient {
         return res.get(0);
     }
 
-    /**
-     * <p>Original spec-file function name: search_solr_wildcard</p>
-     * <pre>
-     * The search_solr_wildcard function that is a modified version of the above function, all because the stupid SOLR 4.*
-     * handles the wildcard search string in a weird way:when the '*' is at either end of the search string, it returns 0 docs
-     * if the search string is within double quotes. On the other hand, when a search string has whitespace(s), it has to be 
-     * inide double quotes otherwise SOLR will treat it as new field(s).
-     * So this method will call the method that builds the search string WITHOUT the double quotes ONLY for the use case when 
-     * '*' will be at the ends of the string.
-     * The rest is the same as the above method.
-     * </pre>
-     * @param   params   instance of type {@link us.kbase.kbsolrutil.SearchSolrParams SearchSolrParams}
-     * @return   parameter "output" of original type "solrresponse" (Solr response data for search requests. Arbitrary key-value pairs returned by the solr.) &rarr; mapping from String to String
-     * @throws IOException if an IO exception occurs
-     * @throws JsonClientException if a JSON RPC exception occurs
-     */
-    public Map<String,String> searchSolrWildcard(SearchSolrParams params, RpcContext... jsonRpcContext) throws IOException, JsonClientException {
-        List<Object> args = new ArrayList<Object>();
-        args.add(params);
-        TypeReference<List<Map<String,String>>> retType = new TypeReference<List<Map<String,String>>>() {};
-        List<Map<String,String>> res = caller.jsonrpcCall("KBSolrUtil.search_solr_wildcard", args, retType, true, true, jsonRpcContext, this.serviceVersion);
-        return res.get(0);
-    }
-
     public Map<String, Object> status(RpcContext... jsonRpcContext) throws IOException, JsonClientException {
         List<Object> args = new ArrayList<Object>();
         TypeReference<List<Map<String, Object>>> retType = new TypeReference<List<Map<String, Object>>>() {};

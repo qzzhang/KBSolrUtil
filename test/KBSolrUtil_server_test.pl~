@@ -31,7 +31,7 @@ sub get_ws_name {
 
 eval {
     my $solrret;
-#begin
+begin
     eval {
         $solrret = $impl->search_solr({
           solr_core => "JEtest",

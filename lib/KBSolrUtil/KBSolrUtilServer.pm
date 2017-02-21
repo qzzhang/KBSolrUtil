@@ -30,14 +30,12 @@ our $CallContext;
 our %return_counts = (
         'index_in_solr' => 1,
         'search_solr' => 1,
-        'search_solr_wildcard' => 1,
         'status' => 1,
 );
 
 our %method_authentication = (
         'index_in_solr' => 'required',
         'search_solr' => 'required',
-        'search_solr_wildcard' => 'required',
 );
 
 sub _build_valid_methods
@@ -46,7 +44,6 @@ sub _build_valid_methods
     my $methods = {
         'index_in_solr' => 1,
         'search_solr' => 1,
-        'search_solr_wildcard' => 1,
         'status' => 1,
     };
     return $methods;

@@ -87,50 +87,6 @@ class KBSolrUtil(object):
             'KBSolrUtil.search_solr',
             [params], self._service_ver, context)
 
-    def search_solr_wildcard(self, params, context=None):
-        """
-        The search_solr_wildcard function that is a modified version of the above function, all because the stupid SOLR 4.*
-        handles the wildcard search string in a weird way:when the '*' is at either end of the search string, it returns 0 docs
-        if the search string is within double quotes. On the other hand, when a search string has whitespace(s), it has to be 
-        inide double quotes otherwise SOLR will treat it as new field(s).
-        So this method will call the method that builds the search string WITHOUT the double quotes ONLY for the use case when 
-        '*' will be at the ends of the string.
-        The rest is the same as the above method.
-        :param params: instance of type "SearchSolrParams" (Arguments for the
-           search_solr function - search solr according to the parameters
-           passed and return a string string search_core - the name of the
-           solr core to be searched searchdata search_param - arbitrary
-           user-supplied key-value pairs defining how the search should be
-           conducted, a hash, see the example below: search_param={ fl =>
-           'object_id,gene_name,genome_source', wt => 'json', rows => 20,
-           sort => 'object_id asc', hl => 'false', start => 0, count => 100 }
-           searchdata search_query - arbitrary user-supplied key-value pairs
-           defining the fields to be searched and their values to be matched,
-           a hash which specifies how the documents will be searched, see the
-           example below: search_query={ parent_taxon_ref => '1779/116411/1',
-           rank => 'species', scientific_lineage => 'cellular organisms;
-           Bacteria; Proteobacteria; Alphaproteobacteria; Rhizobiales;
-           Bradyrhizobiaceae; Bradyrhizobium', scientific_name =>
-           'Bradyrhizobium sp. rp3', domain => 'Bacteria' } OR, simply:
-           search_query= { q => "*" }; string result_format - the format of
-           the search result, 'xml' as the default, can be 'json', 'csv',
-           etc. string group_option - the name of the field to be grouped for
-           the result) -> structure: parameter "search_core" of String,
-           parameter "search_param" of type "searchdata" (User provided
-           parameter data. Arbitrary key-value pairs provided by the user.)
-           -> mapping from String to String, parameter "search_query" of type
-           "searchdata" (User provided parameter data. Arbitrary key-value
-           pairs provided by the user.) -> mapping from String to String,
-           parameter "result_format" of String, parameter "group_option" of
-           String
-        :returns: instance of type "solrresponse" (Solr response data for
-           search requests. Arbitrary key-value pairs returned by the solr.)
-           -> mapping from String to String
-        """
-        return self._client.call_method(
-            'KBSolrUtil.search_solr_wildcard',
-            [params], self._service_ver, context)
-
     def status(self, context=None):
         return self._client.call_method('KBSolrUtil.status',
                                         [], self._service_ver, context)

@@ -80,17 +80,4 @@ module KBSolrUtil {
         The search_solr function that returns a solrresponse consisting of a string in the format of the specified 'result_format' in SearchSolrParams
     */
     funcdef search_solr(SearchSolrParams params) returns (solrresponse output) authentication required;
-    
-
-    /*
-        The search_solr_wildcard function that is a modified version of the above function, all because the stupid SOLR 4.*
-        handles the wildcard search string in a weird way:when the '*' is at either end of the search string, it returns 0 docs
-        if the search string is within double quotes. On the other hand, when a search string has whitespace(s), it has to be 
-        inide double quotes otherwise SOLR will treat it as new field(s).
-        So this method will call the method that builds the search string WITHOUT the double quotes ONLY for the use case when 
-        '*' will be at the ends of the string.
-        The rest is the same as the above method.
-    */
-    funcdef search_solr_wildcard(SearchSolrParams params) returns (solrresponse output) authentication required;
-
 };

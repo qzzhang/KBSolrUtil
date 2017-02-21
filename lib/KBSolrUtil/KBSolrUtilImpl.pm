@@ -5,7 +5,7 @@ use Bio::KBase::Exceptions;
 # http://semver.org 
 our $VERSION = '0.0.1';
 our $GIT_URL = 'https://github.com/qzzhang/KBSolrUtil.git';
-our $GIT_COMMIT_HASH = '21d1c0f9d4734c1fa0c7c25c6f7d864ef47a10ef';
+our $GIT_COMMIT_HASH = 'd0036c7d07a4de8ee4025cfdafd9b56f521bdc4f';
 
 =head1 NAME
 
@@ -104,7 +104,7 @@ sub util_timestamp {
 #   parent_taxon_ref => '1779/116411/1',
 #   rank => 'species',
 #   scientific_lineage => 'cellular organisms; Bacteria; Proteobacteria; Alphaproteobacteria; Rhizobiales; Bradyrhizobiaceae; Bradyrhizobium',
-#   scientific_name => 'Bradyrhizobium sp. rp3',
+#   scientific_name => 'Bradyrhizobium sp. *',
 #   domain => 'Bacteria'
 #}
 # OR, simply:
@@ -121,53 +121,14 @@ sub util_timestamp {
 #   count => $count
 #}
 #
-sub _buildQueryString {
-    my ($self, $searchQuery, $searchParams, $groupOption, $skipEscape) = @_;
-    $skipEscape = {} unless $skipEscape;
-    
-    my $DEFAULT_FIELD_CONNECTOR = "AND";
-
-    if (! $searchQuery) {
-        $self->{is_error} = 1;
-        $self->{errmsg} = "Query parameters not specified";
-        return undef;
-    }
-    
-    # Build the display parameter part 
-    my $paramFields = "";
-    foreach my $key (keys %$searchParams) {
-        $paramFields .= "$key=". URI::Escape::uri_escape($searchParams->{$key}) . "&";
-    }
-    
-    # Build the solr query part
-    my $qStr = "q=";
-    if (defined $searchQuery->{q}) {
-        $qStr .= URI::Escape::uri_escape($searchQuery->{q});
-    } else {
-        foreach my $key (keys %$searchQuery) {
-            if (defined $skipEscape->{$key}) {
-                $qStr .= "+$key:\"" . $searchQuery->{$key} ."\" $DEFAULT_FIELD_CONNECTOR ";
-            } else {
-                $qStr .= "+$key:\"" . URI::Escape::uri_escape($searchQuery->{$key}) . "\" $DEFAULT_FIELD_CONNECTOR ";  
-            }
-        }
-        # Remove last occurance of ' AND '
-        $qStr =~ s/ AND $//g;
-    }
-    my $solrGroup = $groupOption ? "&group=true&group.field=$groupOption" : "";
-    my $retStr = $paramFields . $qStr . $solrGroup;
-    #print "Query string:\n$retStr\n";
-    return $retStr;
-}
-#
-# method name: _buildQueryString_wildcard---This is a modified version of the above function, all because the stupid SOLR 4.*
-# handles the wildcard search string in a weird way:when the '*' is at either end of the search string, it returns 0 docs
+# NOTE: Because the stupid SOLR 4.* handles the wildcard search string in a weird way:when the '*' is at either end of the search string, it returns 0 docs.
 # if the search string is within double quotes. On the other hand, when a search string has whitespace(s), it has to be inside
 # double quotes otherwise SOLR will treat it as new field(s).
-# So this method builds the search string WITHOUT the double quotes ONLY for the use case when '*' will be at the ends of the string.
-# The rest is the same as the above method.
+# So this method builds the search string in such a way, WITHOUT the double quotes ONLY for the use cases when '*' will be at the ends of the value string
+# and, if there is any space in the middle of the string, it replaces the spaces with '*'; for cases when no '*' at the ends of the value string, it adds
+# double quotes to enclose the whole value string (including spaces).
 #
-sub _buildQueryString_wildcard {
+sub _buildQueryString {
     my ($self, $searchQuery, $searchParams, $groupOption, $skipEscape) = @_;
     $skipEscape = {} unless $skipEscape;
     
@@ -187,14 +148,27 @@ sub _buildQueryString_wildcard {
     
     # Build the solr query part
     my $qStr = "q=";
+    my $val;
     if (defined $searchQuery->{q}) {
         $qStr .= URI::Escape::uri_escape($searchQuery->{q});
     } else {
         foreach my $key (keys %$searchQuery) {
-            if (defined $skipEscape->{$key}) {
-                $qStr .= "+$key:" . $searchQuery->{$key} ." $DEFAULT_FIELD_CONNECTOR ";
-            } else {
-                $qStr .= "+$key:" . URI::Escape::uri_escape($searchQuery->{$key}) . " $DEFAULT_FIELD_CONNECTOR ";  
+            $val = $searchQuery->{$key};
+            if( $val =~ m/^\*.*|^\*.*\*$|.*\*$/ ) {
+                $val =~ s/\s+/\*/g;
+                if (defined $skipEscape->{$key}) {
+                   $qStr .= "+$key:" . $val ." $DEFAULT_FIELD_CONNECTOR ";
+                } else {
+                   $qStr .= "+$key:" . URI::Escape::uri_escape($val) . " $DEFAULT_FIELD_CONNECTOR ";  
+                }
+            }
+            else {
+                #$val = "\"" + $val + "\"";
+                if (defined $skipEscape->{$key}) {
+                  $qStr .= "+$key:\"" . $val ."\" $DEFAULT_FIELD_CONNECTOR ";
+                } else {
+                  $qStr .= "+$key:\"" . URI::Escape::uri_escape($val) . "\" $DEFAULT_FIELD_CONNECTOR ";  
+                }
             }
         }
         # Remove last occurance of ' AND '
@@ -204,50 +178,6 @@ sub _buildQueryString_wildcard {
     my $retStr = $paramFields . $qStr . $solrGroup;
     #print "Query string:\n$retStr\n";
     return $retStr;
-}
-#
-# method name: _searchSolr_wildcard---This is a modified version of the above function, all because the stupid SOLR 4.*
-# handles the wildcard search string in a weird way:when the '*' is at either end of the search string, it returns 0 docs
-# if the search string is within double quotes. On the other hand, when a search string has whitespace(s), it has to be inside
-# double quotes otherwise SOLR will treat it as new field(s).
-# So this method will call the method that builds the search string WITHOUT the double quotes ONLY for the use case when '*' will be 
-# at the ends of the string.
-# The rest is the same as the above method.
-#
-sub _searchSolr_wildcard {
-    my ($self, $searchCore, $searchParams, $searchQuery, $resultFormat, $groupOption, $skipEscape) = @_;
-    $skipEscape = {} unless $skipEscape;
-
-    if (!$self->_ping()) {
-        die "\nError--Solr server not responding:\n" . $self->_error->{response};
-    }
-    
-    # If output format is not passed set it to XML
-    $resultFormat = "xml" unless $resultFormat;
-    my $queryString = $self->_buildQueryString_wildcard($searchQuery, $searchParams, $groupOption, $skipEscape);
-    my $solrCore = "/$searchCore"; 
-    my $solrQuery = $self->{_SOLR_URL}.$solrCore."/select?".$queryString;
-    #print "Search string:\n$solrQuery\n";
-    
-    my $solr_response = $self->_sendRequest("$solrQuery", "GET");
-    #print "\nRaw response: \n" . $solr_response->{response} . "\n";
-    
-    my $responseCode = $self->_parseResponse($solr_response, $resultFormat);
-        if ($responseCode) {
-            if ($resultFormat eq "json") {
-                my $out = JSON::from_json($solr_response->{response});
-                $solr_response->{response}= $out;
-            }
-    }
-    if($groupOption){
-        my @solr_records = @{$solr_response->{response}->{grouped}->{$groupOption}->{groups}};
-        if( scalar @solr_records > 0 ) {
-            #print "\nFound unique $groupOption groups of:" . scalar @solr_records . "with recourds of: ";
-            #print @solr_records[0]->{doclist}->{numFound} ."\n";
-        }
-    }
-    
-    return $solr_response;
 }
 
 #
@@ -924,7 +854,7 @@ sub search_solr
         group_option => "",
         skip_escape => {}
     });  
-    my $solrCore = $params->{ search_core }; 
+    my $solrCore = $params->{ solr_core }; 
     my $searchParam = $params->{ search_param };
     my $searchQuery = $params->{ search_query };
     my $resultFormat = $params->{ result_format };
@@ -965,135 +895,6 @@ sub search_solr
 	my $msg = "Invalid returns passed to search_solr:\n" . join("", map { "\t$_\n" } @_bad_returns);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
 							       method_name => 'search_solr');
-    }
-    return($output);
-}
-
-
-=head2 search_solr_wildcard
-
-  $output = $obj->search_solr_wildcard($params)
-
-=over 4
-
-=item Parameter and return types
-
-=begin html
-
-<pre>
-$params is a KBSolrUtil.SearchSolrParams
-$output is a KBSolrUtil.solrresponse
-SearchSolrParams is a reference to a hash where the following keys are defined:
-	search_core has a value which is a string
-	search_param has a value which is a KBSolrUtil.searchdata
-	search_query has a value which is a KBSolrUtil.searchdata
-	result_format has a value which is a string
-	group_option has a value which is a string
-searchdata is a reference to a hash where the key is a string and the value is a string
-solrresponse is a reference to a hash where the key is a string and the value is a string
-
-</pre>
-
-=end html
-
-=begin text
-
-$params is a KBSolrUtil.SearchSolrParams
-$output is a KBSolrUtil.solrresponse
-SearchSolrParams is a reference to a hash where the following keys are defined:
-	search_core has a value which is a string
-	search_param has a value which is a KBSolrUtil.searchdata
-	search_query has a value which is a KBSolrUtil.searchdata
-	result_format has a value which is a string
-	group_option has a value which is a string
-searchdata is a reference to a hash where the key is a string and the value is a string
-solrresponse is a reference to a hash where the key is a string and the value is a string
-
-
-=end text
-
-
-
-=item Description
-
-The search_solr_wildcard function that is a modified version of the above function, all because the stupid SOLR 4.*
-handles the wildcard search string in a weird way:when the '*' is at either end of the search string, it returns 0 docs
-if the search string is within double quotes. On the other hand, when a search string has whitespace(s), it has to be 
-inide double quotes otherwise SOLR will treat it as new field(s).
-So this method will call the method that builds the search string WITHOUT the double quotes ONLY for the use case when 
-'*' will be at the ends of the string.
-The rest is the same as the above method.
-
-=back
-
-=cut
-
-sub search_solr_wildcard
-{
-    my $self = shift;
-    my($params) = @_;
-
-    my @_bad_arguments;
-    (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument \"params\" (value was \"$params\")");
-    if (@_bad_arguments) {
-	my $msg = "Invalid arguments passed to search_solr_wildcard:\n" . join("", map { "\t$_\n" } @_bad_arguments);
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-							       method_name => 'search_solr_wildcard');
-    }
-
-    my $ctx = $KBSolrUtil::KBSolrUtilServer::CallContext;
-    my($output);
-    #BEGIN search_solr_wildcard
-    $params = $self->util_initialize_call($params,$ctx);
-    $params = $self->util_args($params,[],{
-        solr_core => "GenomeFeatures_ci",
-        search_param => {},
-        search_query => {q=>"*"},
-        result_format => "xml",
-        group_option => "",
-        skip_escape => {}
-    });  
-    my $solrCore = $params->{ search_core }; 
-    my $searchParam = $params->{ search_param };
-    my $searchQuery = $params->{ search_query };
-    my $resultFormat = $params->{ result_format };
-    my $groupOption = $params->{ group_option };
-    my $skipEscape = $params->{ skip_escape };
-    my $resultFormat = $params->{ result_format };
-    
-    if (!$self->_ping()) {
-        die "\nError--Solr server not responding:\n" . $self->_error->{response};
-    }
-    
-    my $queryString = $self->_buildQueryString_wildcard($searchQuery, $searchParam, $groupOption, $skipEscape);
-    #my $sort = "&sort=genome_id asc";
-    my $solrQuery = $self->{_SOLR_URL}."/".$solrCore."/select?".$queryString;
-    #print "Search string:\n$solrQuery\n";
-    
-    my $solr_response = $self->_sendRequest("$solrQuery", "GET");
-    #print "\nRaw response: \n" . $solr_response->{response} . "\n";
-    
-    my $responseCode = $self->_parseResponse($solr_response, $resultFormat);
-    if ($responseCode) {
-            if ($resultFormat eq "json") {
-                my $out = JSON::from_json($solr_response->{response});
-                $solr_response->{response}= $out;
-            }
-    }
-    if($groupOption){
-        my @solr_records = @{$solr_response->{response}->{grouped}->{$groupOption}->{groups}};
-        #print "\nFound unique $groupOption groups of:" . scalar @solr_records . "\n";
-        #print @solr_records[0]->{doclist}->{numFound} ."\n";
-    }
-    $output = $solr_response;
-    
-    #END search_solr_wildcard
-    my @_bad_returns;
-    (ref($output) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"output\" (value was \"$output\")");
-    if (@_bad_returns) {
-	my $msg = "Invalid returns passed to search_solr_wildcard:\n" . join("", map { "\t$_\n" } @_bad_returns);
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-							       method_name => 'search_solr_wildcard');
     }
     return($output);
 }
