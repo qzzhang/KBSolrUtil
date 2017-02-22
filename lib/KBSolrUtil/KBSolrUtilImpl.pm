@@ -334,7 +334,6 @@ sub _parseResponse
         "kingdom"=>"Metazoa",
         "GenBank_hidden_flag"=>1,
         "inherited_GC_flag"=>1,"
-        _version_"=>1558736913013145600,
         "deleted"=>0
       },
       {
@@ -365,7 +364,7 @@ sub _parseResponse
 # A list/an array of documents in JSON format:
 =for example:
      $json_out = [
-      {
+     {
         "taxonomy_id":1297193,
         "domain":"Eukaryota",
         "genetic_code":1,
@@ -383,7 +382,6 @@ sub _parseResponse
         "kingdom":"Metazoa",
         "GenBank_hidden_flag":1,
         "inherited_GC_flag":1,"
-        _version_":1558736913013145600,
         "deleted":0
       },
       {
@@ -424,7 +422,8 @@ sub _toJSON
 # Internal method: to add JSON documents to solr for indexing.
 # Depending on the flag AUTOCOMMIT the documents will be indexed immediatly or on commit is issued.
 # parameters:   
-#     $params: This parameter specifies list of document fields and values.
+#     $inputObjs: This parameter specifies list of document fields and values.
+#     $jsonString: truei (1) if $inputObjs is passed as a json string in quotes; default to false (0).
 # return
 #    1 for successful posting of the xml document
 #    0 for any failure
@@ -432,16 +431,26 @@ sub _toJSON
 #
 sub _addJSON2Solr
 {
-    my ($self, $solrCore, $params) = @_;
+    my ($self, $solrCore, $inputObjs, $jsonString) = @_;
     
     if (!$self->_ping()) {
         die "\nError--Solr server not responding:\n" . $self->_error->{response};
     }
 
-    my $docs = $self->_toJSON($params);
+    $jsonString = 0 unless $jsonString;
+
+    my $docs;
+    if ($jsonString == 1) {
+        $docs = $inputObjs;
+    }
+    else {
+        $docs = $self->_toJSON($inputObjs);
+    }
+    
     my $commit = $self->{_AUTOCOMMIT} ? 'true' : 'false';
-    my $url = "$self->{_SOLR_URL}/$solrCore/update/json?commit=true"; #$commit";#for sending an array of json docs
+    my $url = "$self->{_SOLR_URL}/$solrCore/update/json?commit=true";# . $commit; 
     my $response = $self->_sendRequest($url, 'POST', 'binary', $self->{_CT_JSON}, $docs);
+
     if ($self->_parseResponse($response) == 0) {
             $self->{error} = $response;
             $self->{error}->{errmsg} = $@;
@@ -477,13 +486,17 @@ sub _addXML2Solr
     my $doc = $self->_toXML($ds, 'add');
     #print Dumper($doc);
     my $commit = $self->{_AUTOCOMMIT} ? 'true' : 'false';
-    my $url = "$self->{_SOLR_URL}/$solrCore/update?commit=" . $commit;
+    my $url = "$self->{_SOLR_URL}/$solrCore/update?commit=true";# . $commit;
     my $response = $self->_sendRequest($url, 'POST', undef, $self->{_CT_XML}, $doc);
-    return 1 if ($self->_parseResponse($response));
-    $self->{error} = $response;
-    $self->{error}->{errmsg} = $@;
-    #print "\nSolr indexing error:\n" . $self->_error->{response}; #Dumper($response);
-    return 0;
+    
+    if ($self->_parseResponse($response) == 0) {
+            $self->{error} = $response;
+            $self->{error}->{errmsg} = $@;
+            print "\nSolr indexing error:\n" . $self->_error->{response}; 
+            print "\n" . Dumper($response);
+            return 0;
+    }
+    return 1;
 }
 
 #
