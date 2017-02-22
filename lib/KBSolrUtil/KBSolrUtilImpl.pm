@@ -249,10 +249,9 @@ sub _sendRequest
     $request->method($method);
     $request->uri($url);
 
-
     # set headers
     foreach my $header (keys %$headers) {
-        $request->header($header =>  $headers->{$header});
+        $request->header($header=>$headers->{$header});
     }
 
     # set data for posting
@@ -308,6 +307,151 @@ sub _parseResponse
     $self->{is_error} = 1;
     $self->{error} = $response;
     $self->{error}->{errmsg} = $@;
+    return 0;
+}
+
+#
+# internal method: _toJSON, converts a given array of references to an array of JSON documents
+# input format:
+# A list/an array that consists references to an object maps, 
+=for example:
+    $params = 
+[      {
+        "taxonomy_id"=>1297193,
+        "domain"=>"Eukaryota",
+        "genetic_code"=>1,
+        "embl_code"=>"CS",
+        "division_id"=>1,
+        "inherited_div_flag"=>1,
+        "inherited_MGC_flag"=>1,
+        "parent_taxon_ref"=>"12570/1217907/1",
+        "scientific_name"=>"Camponotus sp. MAS010",
+        "mitochondrial_genetic_code"=>5,
+        "hidden_subtree_flag"=>0,
+        "scientific_lineage"=>"cellular organisms; Eukaryota; Opisthokonta; Metazoa; Eumetazoa; Bilateria; Protostomia; Ecdysozoa; Panarthropoda; Arthropoda; Mandibulata; Pancrustacea; Hexapoda; Insecta; Dicondylia; Pterygota; Neoptera; Endopterygota; Hymenoptera; Apocrita; Aculeata; Vespoidea; Formicidae; Formicinae; Camponotini; Camponotus",
+        "rank"=>"species",
+        "ws_ref"=>"12570/1253105/1",
+        "kingdom"=>"Metazoa",
+        "GenBank_hidden_flag"=>1,
+        "inherited_GC_flag"=>1,"
+        _version_"=>1558736913013145600,
+        "deleted"=>0
+      },
+      {
+        "inherited_MGC_flag"=>1,
+        "inherited_div_flag"=>1,
+        "parent_taxon_ref"=>"12570/1217907/1",
+        "genetic_code"=>1,
+        "division_id"=>1,
+        "embl_code"=>"CS",
+        "domain"=>"Eukaryota",
+        "taxonomy_id"=>1297190,
+        "kingdom"=>"Metazoa",
+        "GenBank_hidden_flag"=>1,
+        "inherited_GC_flag"=>1,
+        "ws_ref"=>"12570/1253106/1",
+        "scientific_lineage"=>"cellular organisms; Eukaryota; Opisthokonta; Metazoa; Eumetazoa; Bilateria; Protostomia; Ecdysozoa; Panarthropoda; Arthropoda; Mandibulata; Pancrustacea; Hexapoda; Insecta; Dicondylia; Pterygota; Neoptera; Endopterygota; Hymenoptera; Apocrita; Aculeata; Vespoidea; Formicidae; Formicinae; Camponotini; Camponotus",
+        "rank"=>"species",
+        "scientific_name"=>"Camponotus sp. MAS003",
+        "hidden_subtree_flag"=>0,
+        "mitochondrial_genetic_code"=>5,
+        "deleted"=>0
+      },
+...
+   ];
+=cut end of example
+#
+# output format:
+# A list/an array of documents in JSON format:
+=for example:
+     $json_out = [
+      {
+        "taxonomy_id":1297193,
+        "domain":"Eukaryota",
+        "genetic_code":1,
+        "embl_code":"CS",
+        "division_id":1,
+        "inherited_div_flag":1,
+        "inherited_MGC_flag":1,
+        "parent_taxon_ref":"12570/1217907/1",
+        "scientific_name":"Camponotus sp. MAS010",
+        "mitochondrial_genetic_code":5,
+        "hidden_subtree_flag":0,
+        "scientific_lineage":"cellular organisms; Eukaryota; Opisthokonta; Metazoa; Eumetazoa; Bilateria; Protostomia; Ecdysozoa; Panarthropoda; Arthropoda; Mandibulata; Pancrustacea; Hexapoda; Insecta; Dicondylia; Pterygota; Neoptera; Endopterygota; Hymenoptera; Apocrita; Aculeata; Vespoidea; Formicidae; Formicinae; Camponotini; Camponotus",
+        "rank":"species",
+        "ws_ref":"12570/1253105/1",
+        "kingdom":"Metazoa",
+        "GenBank_hidden_flag":1,
+        "inherited_GC_flag":1,"
+        _version_":1558736913013145600,
+        "deleted":0
+      },
+      {
+        "inherited_MGC_flag":1,
+        "inherited_div_flag":1,
+        "parent_taxon_ref":"12570/1217907/1",
+        "genetic_code":1,
+        "division_id":1,
+        "embl_code":"CS",
+        "domain":"Eukaryota",
+        "taxonomy_id":1297190,
+        "kingdom":"Metazoa",
+        "GenBank_hidden_flag":1,
+        "inherited_GC_flag":1,
+        "ws_ref":"12570/1253106/1",
+        "scientific_lineage":"cellular organisms; Eukaryota; Opisthokonta; Metazoa; Eumetazoa; Bilateria; Protostomia; Ecdysozoa; Panarthropoda; Arthropoda; Mandibulata; Pancrustacea; Hexapoda; Insecta; Dicondylia; Pterygota; Neoptera; Endopterygota; Hymenoptera; Apocrita; Aculeata; Vespoidea; Formicidae; Formicinae; Camponotini; Camponotus",
+        "rank":"species",
+        "scientific_name":"Camponotus sp. MAS003",
+        "hidden_subtree_flag":0,
+        "mitochondrial_genetic_code":5,
+        "deleted":0
+      },
+...
+  ] 
+=cut end of example
+#
+sub _toJSON
+{
+    my ($self, $params) = @_;
+    my $json = new JSON;
+    my $json_docs = [];
+    #my $json = JSON->new->pretty();
+    for (my $i=0; $i < @{ $params }; $i++) {
+        push(@{$json_docs}, $json->pretty->encode($params->[$i]));
+    }
+    print Dumper($params). "\n";
+    print ref(\$json_docs);
+    return $json_docs; 
+}
+
+#
+# method name: _addJSON2Solr
+# Internal method: to add JSON documents to solr for indexing.
+# Depending on the flag AUTOCOMMIT the documents will be indexed immediatly or on commit is issued.
+# parameters:   
+#     $params: This parameter specifies list of document fields and values.
+# return
+#    1 for successful posting of the xml document
+#    0 for any failure
+#
+#
+sub _addJSON2Solr
+{
+    my ($self, $solrCore, $params) = @_;
+    
+    if (!$self->_ping()) {
+        die "\nError--Solr server not responding:\n" . $self->_error->{response};
+    }
+
+    my $docs = $self->_toJSON($params);
+    print Dumper($docs);
+    my $commit = $self->{_AUTOCOMMIT} ? 'true' : 'false';
+    my $url = "$self->{_SOLR_URL}/$solrCore/update?commit=" . $commit;
+    my $response = $self->_sendRequest($url, 'POST', undef, $self->{_CT_JSON}, $docs);
+    return 1 if ($self->_parseResponse($response));
+    $self->{error} = $response;
+    $self->{error}->{errmsg} = $@;
+    print "\nSolr indexing error:\n" . $self->_error->{response}; #Dumper($response);
     return 0;
 }
 
@@ -381,13 +525,13 @@ sub _toXML
     my ($self, $params, $rootnode) = @_;
     my $xs = new XML::Simple();
     my $xml;
-    if (! $rootnode) {
-    $xml = $xs->XMLout($params);
+    if (!$rootnode) {
+        $xml = $xs->XMLout($params);
     } else {
-    $xml = $xs->XMLout($params, rootname => $rootnode);
+        $xml = $xs->XMLout($params, rootname => $rootnode);
     }
-    #print "\n$xml\n";                                               
-        return $xml;
+    #print "\n$xml\n";
+    return $xml;
 }
 
 #
@@ -665,7 +809,8 @@ sub new
     $self->{_SOLR_PING_URL} = "$self->{_SOLR_URL}/select";
     $self->{_AUTOCOMMIT} = 0;
     $self->{_CT_XML} = { Content_Type => 'text/xml; charset=utf-8' };
-    $self->{_CT_JSON} = { Content_Type => 'text/json'};
+    #$self->{_CT_JSON} = { Content_Type => 'text/json'};
+    $self->{_CT_JSON} = { Content_Type => 'application/json'};
 
     #END_CONSTRUCTOR
 
