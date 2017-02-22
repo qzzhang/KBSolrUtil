@@ -240,7 +240,7 @@ sub _sendRequest
     $url = ($url) ? $url : $self->{_SOLR_URL};
     $headers = ($headers) ?  $headers : {};
     $data = ($data) ? $data: '';
-print $url;
+    
     my $out = {};
 
     # create a HTTP request
@@ -256,7 +256,7 @@ print $url;
 
     # set data for posting
     $request->content($data);
-    print "The HTTP request: \n" . Dumper($request) . "\n";
+    #print "\nThe HTTP request: \n" . Dumper($request) . "\n";
     
     # Send request and receive the response
     my $response = $ua->request($request);
@@ -293,16 +293,16 @@ sub _parseResponse
                 if ($resRef->{responseHeader}->{status} eq 0) {
                         return 1;
                 }
-            } else {
+           } else {
                 my $xs = new XML::Simple();
                 my $xmlRef;
                 eval {
                         $xmlRef = $xs->XMLin($response->{response});
                 };
-                if ($xmlRef->{lst}->{'int'}->{status}->{content} eq 0){
+                if ($xmlRef->{lst}->{'int'}->{status}->{content} == 0){
                         return 1;
                 }
-            }
+           }
     }
     $self->{is_error} = 1;
     $self->{error} = $response;
@@ -415,9 +415,7 @@ sub _toJSON
     my ($self, $params) = @_;
     my $json = new JSON;
     my $json_docs = [];
-    for (my $i=0; $i < @{ $params }; $i++) {
-        push(@{$json_docs}, $json->pretty->encode($params->[$i]));
-    }
+    $json_docs = $json->encode($params);
     return $json_docs; 
 }
 
@@ -441,21 +439,17 @@ sub _addJSON2Solr
     }
 
     my $docs = $self->_toJSON($params);
-    #print Dumper($docs);
     my $commit = $self->{_AUTOCOMMIT} ? 'true' : 'false';
-    my $url = "$self->{_SOLR_URL}/$solrCore/update/json/docs";
-
-    foreach my $doc (@{$docs})  { 
-        my $response = $self->_sendRequest($url, 'POST', 'binary', $self->{_CT_JSON}, $doc);
-        if (!$self->_parseResponse($response)) {
+    my $url = "$self->{_SOLR_URL}/$solrCore/update/json?commit=true"; #$commit";#for sending an array of json docs
+    my $response = $self->_sendRequest($url, 'POST', 'binary', $self->{_CT_JSON}, $docs);
+    if ($self->_parseResponse($response) == 0) {
             $self->{error} = $response;
             $self->{error}->{errmsg} = $@;
             print "\nSolr indexing error:\n" . $self->_error->{response}; 
             print "\n" . Dumper($response);
             return 0;
-        }
-     }
-     return 1;
+    }
+    return 1;
 }
 
 #
