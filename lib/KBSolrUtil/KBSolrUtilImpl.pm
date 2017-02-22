@@ -240,7 +240,7 @@ sub _sendRequest
     $url = ($url) ? $url : $self->{_SOLR_URL};
     $headers = ($headers) ?  $headers : {};
     $data = ($data) ? $data: '';
-
+print $url;
     my $out = {};
 
     # create a HTTP request
@@ -256,7 +256,7 @@ sub _sendRequest
 
     # set data for posting
     $request->content($data);
-    #print "The HTTP request: \n" . Dumper($request) . "\n";
+    print "The HTTP request: \n" . Dumper($request) . "\n";
     
     # Send request and receive the response
     my $response = $ua->request($request);
@@ -415,12 +415,9 @@ sub _toJSON
     my ($self, $params) = @_;
     my $json = new JSON;
     my $json_docs = [];
-    #my $json = JSON->new->pretty();
     for (my $i=0; $i < @{ $params }; $i++) {
         push(@{$json_docs}, $json->pretty->encode($params->[$i]));
     }
-    print Dumper($params). "\n";
-    print ref(\$json_docs);
     return $json_docs; 
 }
 
@@ -444,15 +441,21 @@ sub _addJSON2Solr
     }
 
     my $docs = $self->_toJSON($params);
-    print Dumper($docs);
+    #print Dumper($docs);
     my $commit = $self->{_AUTOCOMMIT} ? 'true' : 'false';
-    my $url = "$self->{_SOLR_URL}/$solrCore/update?commit=" . $commit;
-    my $response = $self->_sendRequest($url, 'POST', undef, $self->{_CT_JSON}, $docs);
-    return 1 if ($self->_parseResponse($response));
-    $self->{error} = $response;
-    $self->{error}->{errmsg} = $@;
-    print "\nSolr indexing error:\n" . $self->_error->{response}; #Dumper($response);
-    return 0;
+    my $url = "$self->{_SOLR_URL}/$solrCore/update/json/docs";
+
+    foreach my $doc (@{$docs})  { 
+        my $response = $self->_sendRequest($url, 'POST', 'binary', $self->{_CT_JSON}, $doc);
+        if (!$self->_parseResponse($response)) {
+            $self->{error} = $response;
+            $self->{error}->{errmsg} = $@;
+            print "\nSolr indexing error:\n" . $self->_error->{response}; 
+            print "\n" . Dumper($response);
+            return 0;
+        }
+     }
+     return 1;
 }
 
 #
