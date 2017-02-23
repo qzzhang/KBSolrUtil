@@ -5,7 +5,7 @@ use Bio::KBase::Exceptions;
 # http://semver.org 
 our $VERSION = '0.0.1';
 our $GIT_URL = 'https://github.com/qzzhang/KBSolrUtil.git';
-our $GIT_COMMIT_HASH = 'd0036c7d07a4de8ee4025cfdafd9b56f521bdc4f';
+our $GIT_COMMIT_HASH = 'd09da9807c505912bbe05d75a8935da678dc1f41';
 
 =head1 NAME
 
@@ -853,7 +853,7 @@ sub new
 $params is a KBSolrUtil.IndexInSolrParams
 $output is an int
 IndexInSolrParams is a reference to a hash where the following keys are defined:
-	search_core has a value which is a string
+	solr_core has a value which is a string
 	doc_data has a value which is a reference to a list where each element is a KBSolrUtil.docdata
 docdata is a reference to a hash where the key is a string and the value is a string
 
@@ -866,7 +866,7 @@ docdata is a reference to a hash where the key is a string and the value is a st
 $params is a KBSolrUtil.IndexInSolrParams
 $output is an int
 IndexInSolrParams is a reference to a hash where the following keys are defined:
-	search_core has a value which is a string
+	solr_core has a value which is a string
 	doc_data has a value which is a reference to a list where each element is a KBSolrUtil.docdata
 docdata is a reference to a hash where the key is a string and the value is a string
 
@@ -1233,7 +1233,7 @@ a reference to a hash where the key is a string and the value is a string
 
 Arguments for the index_in_solr function - send doc data to solr for indexing
 
-string search_core - the name of the solr core to index to
+string solr_core - the name of the solr core to index to
 list<docdata> doc_data - the doc to be indexed, a list of hashes
 
 
@@ -1243,7 +1243,7 @@ list<docdata> doc_data - the doc to be indexed, a list of hashes
 
 <pre>
 a reference to a hash where the following keys are defined:
-search_core has a value which is a string
+solr_core has a value which is a string
 doc_data has a value which is a reference to a list where each element is a KBSolrUtil.docdata
 
 </pre>
@@ -1253,7 +1253,7 @@ doc_data has a value which is a reference to a list where each element is a KBSo
 =begin text
 
 a reference to a hash where the following keys are defined:
-search_core has a value which is a string
+solr_core has a value which is a string
 doc_data has a value which is a reference to a list where each element is a KBSolrUtil.docdata
 
 
@@ -1274,25 +1274,26 @@ doc_data has a value which is a reference to a list where each element is a KBSo
 Arguments for the search_solr function - search solr according to the parameters passed and return a string
 
 string search_core - the name of the solr core to be searched
-searchdata search_param - arbitrary user-supplied key-value pairs defining how the search should be conducted, 
-        a hash, see the example below:
+searchdata search_param - arbitrary user-supplied key-value pairs for controlling the presentation of the query response, 
+                        a hash, see the example below:
         search_param={
                 fl => 'object_id,gene_name,genome_source',
                 wt => 'json',
                 rows => 20,
                 sort => 'object_id asc',
                 hl => 'false',
-                start => 0,
-                count => 100
+                start => 100
         }
+OR, default to SOLR default settings, i
+        search_param={{fl=>'*',wt=>'xml',rows=>10,sort=>'',hl=>'false',start=>0}
 
-searchdata search_query - arbitrary user-supplied key-value pairs defining the fields to be searched and their values 
+searchdata search_query - arbitrary user-supplied key-value pairs specifying the fields to be searched and their values 
                         to be matched, a hash which specifies how the documents will be searched, see the example below:
         search_query={
                 parent_taxon_ref => '1779/116411/1',
                 rank => 'species',
                 scientific_lineage => 'cellular organisms; Bacteria; Proteobacteria; Alphaproteobacteria; Rhizobiales; Bradyrhizobiaceae; Bradyrhizobium',
-                scientific_name => 'Bradyrhizobium sp. rp3',
+                scientific_name => 'Bradyrhizobium sp.*',
                 domain => 'Bacteria'
         }
 OR, simply:

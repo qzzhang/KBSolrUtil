@@ -24,11 +24,11 @@ module KBSolrUtil {
     /*
         Arguments for the index_in_solr function - send doc data to solr for indexing
         
-        string search_core - the name of the solr core to index to
+        string solr_core - the name of the solr core to index to
         list<docdata> doc_data - the doc to be indexed, a list of hashes 
     */
     typedef structure {
-       string search_core;
+       string solr_core;
        list<docdata> doc_data;
     } IndexInSolrParams;
 
