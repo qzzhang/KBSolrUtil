@@ -114,11 +114,10 @@ sub util_timestamp {
 # $searchParams={                                                                                                                                     
 #   fl => 'object_id,gene_name,genome_source',
 #   wt => 'json',
-#   rows => $count,
+#   rows => 20,
 #   sort => 'object_id asc',
 #   hl => 'false',
-#   start => $start,
-#   count => $count
+#   start => $start
 #}
 #
 # NOTE: Because the stupid SOLR 4.* handles the wildcard search string in a weird way:when the '*' is at either end of the search string, it returns 0 docs.
@@ -129,8 +128,9 @@ sub util_timestamp {
 # double quotes to enclose the whole value string (including spaces).
 #
 sub _buildQueryString {
-    my ($self, $searchQuery, $searchParams, $groupOption, $skipEscape) = @_;
+    my ($self, $searchQuery, $searchParams, $groupOption, $resultFormat, $skipEscape) = @_;
     $skipEscape = {} unless $skipEscape;
+    $resultFormat = "xml" unless $resultFormat;
     
     my $DEFAULT_FIELD_CONNECTOR = "AND";
 
@@ -143,7 +143,12 @@ sub _buildQueryString {
     # Build the display parameter part                                             
     my $paramFields = "";                                                                                                                                                                                            
     foreach my $key (keys %$searchParams) {
-        $paramFields .= "$key=". URI::Escape::uri_escape($searchParams->{$key}) . "&";
+        if( $key eq "wt" ) {
+           $paramFields .= "$key=". URI::Escape::uri_escape($resultFormat}) . "&";
+        }
+        else {
+           $paramFields .= "$key=". URI::Escape::uri_escape($searchParams->{$key}) . "&";
+       }
     }
     
     # Build the solr query part
@@ -154,8 +159,8 @@ sub _buildQueryString {
     } else {
         foreach my $key (keys %$searchQuery) {
             $val = $searchQuery->{$key};
-            if( $val =~ m/^\*.*|^\*.*\*$|.*\*$/ ) {
-                $val =~ s/\s+/\*/g;
+            if( $val =~ m/^\*.*|^\*.*\*$|.*\*$/ ) {#when there is '*' at the ends of the search value
+                $val =~ s/\s+/\*/g;#replace the spaces with '*' otherwise without the double quote, spaces will be problematic
                 if (defined $skipEscape->{$key}) {
                    $qStr .= "+$key:" . $val ." $DEFAULT_FIELD_CONNECTOR ";
                 } else {
@@ -163,7 +168,6 @@ sub _buildQueryString {
                 }
             }
             else {
-                #$val = "\"" + $val + "\"";
                 if (defined $skipEscape->{$key}) {
                   $qStr .= "+$key:\"" . $val ."\" $DEFAULT_FIELD_CONNECTOR ";
                 } else {
@@ -1015,14 +1019,12 @@ sub search_solr
     my $resultFormat = $params->{ result_format };
     my $groupOption = $params->{ group_option };
     my $skipEscape = $params->{ skip_escape };
-    my $resultFormat = $params->{ result_format };
     
     if (!$self->_ping()) {
         die "\nError--Solr server not responding:\n" . $self->_error->{response};
     }
     
-    my $queryString = $self->_buildQueryString($searchQuery, $searchParam, $groupOption, $skipEscape);
-    #my $sort = "&sort=genome_id asc";
+    my $queryString = $self->_buildQueryString($searchQuery, $searchParam, $groupOption, $resultFormat, $skipEscape);
     my $solrQuery = $self->{_SOLR_URL}."/".$solrCore."/select?".$queryString;
     #print "Search string:\n$solrQuery\n";
     
