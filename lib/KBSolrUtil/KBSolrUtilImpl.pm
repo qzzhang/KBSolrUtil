@@ -1013,12 +1013,12 @@ sub search_solr
         group_option => "",
         skip_escape => {}
     });  
-    my $solrCore = $params->{ solr_core }; 
-    my $searchParam = $params->{ search_param };
-    my $searchQuery = $params->{ search_query };
-    my $resultFormat = $params->{ result_format };
-    my $groupOption = $params->{ group_option };
-    my $skipEscape = $params->{ skip_escape };
+    my $solrCore = $params->{solr_core}; 
+    my $searchParam = $params->{search_param};
+    my $searchQuery = $params->{search_query};
+    my $resultFormat = $params->{result_format};
+    my $groupOption = $params->{group_option};
+    my $skipEscape = $params->{skip_escape};
     
     if (!$self->_ping()) {
         die "\nError--Solr server not responding:\n" . $self->_error->{response};
