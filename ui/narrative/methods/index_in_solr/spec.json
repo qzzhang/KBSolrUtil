@@ -1,0 +1,87 @@
+{
+    "ver": "0.0.1",
+    "authors": [
+        "qzhang"
+    ],
+    "contact": "https://kbase.us/contact-us/",
+    "categories": ["active"],
+    "widgets": {
+        "input": null,
+        "output": "kbaseGenomeView"
+    },
+    "parameters": [ 
+        {
+            "id": "solr_core",
+            "optional": false,
+            "advanced": false,
+            "allow_multiple": false,
+            "default_values": "",
+            "field_type": "dropdown",
+            "dropdown_options":{
+                "options": [
+                {
+                  "value": "taxonomy",
+                  "display": "taxonomy",
+                  "id": "taxonomy",
+                  "ui_name": "taxonomy"
+                },
+                {
+                  "value": "genomes",
+                  "display": "genomes",
+                  "id": "genomes",
+                  "ui_name": "genomes"
+                },
+                {
+                  "value": "Reactions",
+                  "display": "Reactions",
+                  "id": "Reactions",
+                  "ui_name": "Reactions"
+                }
+              ]
+            }
+        },
+        {
+            "id": "doc_data",
+            "optional": false,
+            "advanced": false,
+            "allow_multiple": false,
+            "default_values": [ {} ],
+            "field_type": "text",
+            "text_options": {
+                "valid_ws_types": [ "KBaseGenomes.Genome-", "KBaseGenomeAnnotations.Taxon-" ]
+            }
+        }
+    ],
+    "behavior": {
+        "service-mapping": {
+            "url": "",
+            "name": "KBSolrUtil",
+            "method": "index_in_solr",
+            "input_mapping": [
+                {
+                    "input_parameter": "solr_core",
+                    "target_property": "solr_core"
+                },
+                {
+                    "input_parameter": "doc_data",
+                    "target_property": "doc_data"
+                }
+            ],
+            "output_mapping": [
+                {
+                    "service_method_output_path": [0],
+                    "target_property": "index_in_solr_result"
+                },
+                {
+                    "input_parameter": "solr_core",
+                    "target_property": "solr_core"
+                },
+                {
+                    "input_parameter": "doc_data",
+                    "target_property": "input_doc_data"
+                }
+            ]
+        }
+    },
+    "job_id_output_field": "docker"
+}

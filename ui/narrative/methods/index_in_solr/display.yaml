@@ -1,9 +1,9 @@
 #
 # define display information
 #
-name: Filter Contigs
+name: Index in Solr
 tooltip: |
-    Filters the contigs by removing contigs below a length threshold
+    Index KBase Data in Solr for Search
 screenshots: []
 
 icon: icon.png
@@ -21,21 +21,21 @@ suggestions:
         related:
             []
         next:
-            [annotate_contigset]
+            []
 
 #
 # Configure the display and description of parameters
 #
 parameters :
-    contigset_id :
+    solr_core :
         ui-name : |
-            Contig Set Name
+            Solr Database Name
         short-hint : |
-            The contig set to filter (will be overwritten)
-    min_length :
+            The name of the target Solr core
+    doc_data :
         ui-name : |
-            Min Length Threshold
+            Data to Index
         short-hint : |
-            All contigs below this length will be removed
+            The data to be indexed in Solr
 description : |
-    <p>This is a simple method designed to illustrate the KBase SDK.</p>
+    <p>This method is designed to send data to Solr for indexing.</p>
