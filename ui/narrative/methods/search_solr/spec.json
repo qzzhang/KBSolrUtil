@@ -36,6 +36,12 @@
                   "display": "Reactions",
                   "id": "Reactions",
                   "ui_name": "Reactions"
+                },
+                {
+                  "value": "Roles",
+                  "display": "Roles",
+                  "id": "Roles",
+                  "ui_name": "Roles"
                 }
               ]
             }
