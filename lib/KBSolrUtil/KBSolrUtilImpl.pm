@@ -141,14 +141,17 @@ sub _buildQueryString {
     }
     
     # Build the display parameter part                                             
-    my $paramFields = "";                                                                                                                                                                                            
+    my $paramFields = "";
+    if( $resultFormat ne "xml" ) {
+        $paramFields .= "wt=". URI::Escape::uri_escape($resultFormat) . "&";
+    }    
     foreach my $key (keys %$searchParams) {
         if( $key eq "wt" ) {
-           $paramFields .= "$key=". URI::Escape::uri_escape($resultFormat}) . "&";
+            #do nothing
         }
         else {
            $paramFields .= "$key=". URI::Escape::uri_escape($searchParams->{$key}) . "&";
-       }
+        }
     }
     
     # Build the solr query part
@@ -315,7 +318,7 @@ sub _parseResponse
 }
 
 #
-# internal method: _toJSON, converts a given array of references to an array of JSON documents
+# internal method: _toJSON, converts a given array of references (Perl scalars) to an array of JSON documents
 # input format:
 # A list/an array that consists references to an object maps, 
 =for example:
@@ -414,10 +417,9 @@ sub _parseResponse
 #
 sub _toJSON
 {
-    my ($self, $params) = @_;
-    my $json = new JSON;
+    my ($self, $inputData) = @_;
     my $json_docs = [];
-    $json_docs = $json->encode($params);
+    $json_docs = JSON->new->encode($inputData); 
     return $json_docs; 
 }
 
@@ -427,7 +429,7 @@ sub _toJSON
 # Depending on the flag AUTOCOMMIT the documents will be indexed immediatly or on commit is issued.
 # parameters:   
 #     $inputObjs: This parameter specifies list of document fields and values.
-#     $jsonString: truei (1) if $inputObjs is passed as a json string in quotes; default to false (0).
+#     $jsonString: true (1) if $inputObjs is passed as a json string in quotes; default to false (0).
 # return
 #    1 for successful posting of the xml document
 #    0 for any failure
@@ -436,23 +438,25 @@ sub _toJSON
 sub _addJSON2Solr
 {
     my ($self, $solrCore, $inputObjs, $jsonString) = @_;
-    
+#=begin    
     if (!$self->_ping()) {
         die "\nError--Solr server not responding:\n" . $self->_error->{response};
     }
+#=cut
 
     $jsonString = 0 unless $jsonString;
-
     my $docs;
     if ($jsonString == 1) {
         $docs = $inputObjs;
     }
     else {
         $docs = $self->_toJSON($inputObjs);
+        #print "\nConverted Perl scalars to json:\n " . Dumper($docs);
     }
     
     my $commit = $self->{_AUTOCOMMIT} ? 'true' : 'false';
     my $url = "$self->{_SOLR_URL}/$solrCore/update/json?commit=true";# . $commit; 
+#=begin
     my $response = $self->_sendRequest($url, 'POST', 'binary', $self->{_CT_JSON}, $docs);
 
     if ($self->_parseResponse($response) == 0) {
@@ -462,6 +466,7 @@ sub _addJSON2Solr
             print "\n" . Dumper($response);
             return 0;
     }
+#=cut
     return 1;
 }
 
@@ -901,7 +906,7 @@ sub index_in_solr
     #BEGIN index_in_solr
     $params = $self->util_initialize_call($params,$ctx);
     $params = $self->util_args($params,[],{
-        solr_core => "GenomeFeatures_ci",
+        solr_core => "",
         doc_data => []
     });  
  
@@ -1032,11 +1037,12 @@ sub search_solr
     #print "\nRaw response: \n" . $solr_response->{response} . "\n";
     
     my $responseCode = $self->_parseResponse($solr_response, $resultFormat);
-        if ($responseCode) {
-            if ($resultFormat eq "json") {
-                my $out = JSON::from_json($solr_response->{response});
-                $solr_response->{response}= $out;
-            }
+        
+    if ($responseCode) {
+        if ($resultFormat eq "json") {
+            my $out = JSON::from_json($solr_response->{response});
+            $solr_response->{response}= $out;
+        }
     }
     if($groupOption){
         my @solr_records = @{$solr_response->{response}->{grouped}->{$groupOption}->{groups}};
@@ -1055,8 +1061,6 @@ sub search_solr
     }
     return($output);
 }
-
-
 
 
 =head2 status 
