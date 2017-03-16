@@ -30,14 +30,43 @@ sub get_ws_name {
 }
 
 eval {
-    my $solrret;
+#=begin
+    my $solrgnm;
+    my $ret_gnms;
+    eval {
+        $solrgnm = $impl->search_solr({
+          solr_core => "GenomeFeatures_prod",
+          search_param => {},
+          #search_query => {'abbreviation'=>'RXNQT-4349.c'}, #{q=>"*"},
+          search_query => {"object_type"=>'KBaseGenomes.Genome-8.2'},
+          result_format => "json",
+          group_option => "",
+          skip_escape => {}
+        });  
+    };
+    ok(!$@, "search_solr command successful");
+    if ($@) { 
+         print "ERROR:".$@;
+    } else {
+         print "Search results:" . Dumper($solrgnm->{response}->{response}) . "\n";
+         $ret_gnms = $solrgnm->{response}->{response}->{docs};
+         foreach my $gnm (@{$ret_gnms}) {
+         #first remove the _version_ field 
+            delete $gnm->{_version_};
+         #then insert the $gnm
+            $impl->_addJSON2Solr("Genomes_ci", JSON->new->encode($gnm), 1); }
+     }
+    ok(defined($solrgnm),"_search_solr command returned result.");
+#=cut   
+
 =begin
+    my $solrret;
     eval {
         $solrret = $impl->search_solr({
-          solr_core => "JEtest",
+          solr_core => "Reactions",
           search_param => {},
-          search_query => {q=>"*"},
-          result_format => "xml",
+          search_query => {'abbreviation'=>'RXNQT-4349.c'}, #{q=>"*"},
+          result_format => "json",
           group_option => "",
           skip_escape => {}
         });  
@@ -50,6 +79,7 @@ eval {
     }
     ok(defined($solrret),"_search_solr command returned result.");
 =cut   
+
 =begin 
     eval {
         $solrret = $impl->search_solr({
@@ -158,10 +188,10 @@ eval {
         "ws_ref":"12570/1253105/1",
         "kingdom":"Metazoa",
         "GenBank_hidden_flag":1,
-        "inherited_GC_flag":1,"
+        "inherited_GC_flag":1,
         "deleted":0
-      },
-      {
+    },
+    {
         "inherited_MGC_flag":1,
         "inherited_div_flag":1,
         "parent_taxon_ref":"12570/1217907/1",
@@ -196,7 +226,7 @@ eval {
 =cut
 =begin 
     eval {
-        $jsonret = $impl->_addJSON2Solr("BiochemData", $jsonret, 1);
+        $jsonret = $impl->_addJSON2Solr("BiochemData", $json_out, 1);
     };
     ok(!$@, "_addJSON2Solr command successful");
     if ($@) { 
@@ -206,7 +236,7 @@ eval {
     }
     ok(defined($jsonret)," JSON indexing succeeded.");
 =cut
-#=begin
+=begin
     my $xmlret; 
     eval {
         $xmlret = $impl->_addXML2Solr("BiochemData", $inputObjs);
@@ -218,7 +248,7 @@ eval {
          print Dumper($xmlret) ."\n";
     }
     ok(defined($xmlret)," XML indexing succeeded.");
-#=cut
+=cut
     done_testing(6);
 };
 
