@@ -36,27 +36,39 @@ eval {
     eval {
         $solrgnm = $impl->search_solr({
           solr_core => "GenomeFeatures_prod",
-          search_param => {},
-          #search_query => {'abbreviation'=>'RXNQT-4349.c'}, #{q=>"*"},
+          search_param => {
+                rows => 67058,
+                wt => 'json'
+          },
           search_query => {"object_type"=>'KBaseGenomes.Genome-8.2'},
           result_format => "json",
           group_option => "",
           skip_escape => {}
-        });  
+        });
     };
     ok(!$@, "search_solr command successful");
-    if ($@) { 
+    if ($@) {
          print "ERROR:".$@;
     } else {
-         print "Search results:" . Dumper($solrgnm->{response}->{response}) . "\n";
+         #print "Search results:" . Dumper($solrgnm->{response}->{response}) . "\n";
          $ret_gnms = $solrgnm->{response}->{response}->{docs};
+         my $num = $solrgnm->{response}->{response}->{numFound};
          foreach my $gnm (@{$ret_gnms}) {
-         #first remove the _version_ field 
+            #push @{$new_gnms},delete $gnm->{_version_};
             delete $gnm->{_version_};
+         }
          #then insert the $gnm
-            $impl->_addJSON2Solr("Genomes_ci", JSON->new->encode($gnm), 1); }
-     }
-    ok(defined($solrgnm),"_search_solr command returned result.");
+         eval {
+                $impl->_addJSON2Solr("Genomes_prod", $ret_gnms);
+         };
+        ok(!$@, "addJSON2Solr command successful");
+        if ($@) {
+                print "ERROR:".$@;
+        } else {
+                print "Done!";
+        }
+    }
+    ok(defined($solrgnm),"_addJSON2Solr completed.");
 #=cut   
 
 =begin
