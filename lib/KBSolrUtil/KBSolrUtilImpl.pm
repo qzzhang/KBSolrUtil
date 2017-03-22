@@ -5,7 +5,7 @@ use Bio::KBase::Exceptions;
 # http://semver.org 
 our $VERSION = '0.0.1';
 our $GIT_URL = 'https://github.com/qzzhang/KBSolrUtil.git';
-our $GIT_COMMIT_HASH = 'd09da9807c505912bbe05d75a8935da678dc1f41';
+our $GIT_COMMIT_HASH = '239f4358383d6427b6c71e2fe0538bc97f9c3cd5';
 
 =head1 NAME
 
@@ -181,7 +181,7 @@ sub _buildQueryString {
         # Remove last occurance of ' AND '
         $qStr =~ s/ AND $//g;
     }
-    my $solrGroup = $groupOption ? "&group=true&group.field=$groupOption" : "";
+    my $solrGroup = $groupOption ? "&group=true&group.ngroups=true&group.field=$groupOption" : "";
     my $retStr = $paramFields . $qStr . $solrGroup;
     #print "Query string:\n$retStr\n";
     return $retStr;
@@ -744,7 +744,6 @@ sub _exists
     my $url = $self->{_SOLR_URL}."/$solrCore/select?";
     $url = $url. $queryString;
     my $response = $self->_sendRequest($url, 'GET');
-
     my $status = $self->_parseResponse($response);
     if ($status == 1) {
         my $xs = new XML::Simple();
@@ -752,7 +751,7 @@ sub _exists
         eval {
             $xmlRef = $xs->XMLin($response->{response});
         };
-        print "\n$url result:\n" . Dumper($xmlRef->{result}) . "\n";
+        #print "\n$url result:\n" . Dumper($xmlRef->{result}) . "\n";
         if ($xmlRef->{lst}->{'int'}->{status}->{content} eq 0){
             if ($xmlRef->{result}->{numFound} gt 0) {
             return 1;
@@ -1011,6 +1010,87 @@ sub index_in_solr
 
 
 
+=head2 exists_in_solr
+
+  $output = $obj->exists_in_solr($params)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$params is a KBSolrUtil.ExistsInputParams
+$output is an int
+ExistsInputParams is a reference to a hash where the following keys are defined:
+	search_core has a value which is a string
+	search_query has a value which is a KBSolrUtil.searchdata
+searchdata is a reference to a hash where the key is a string and the value is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$params is a KBSolrUtil.ExistsInputParams
+$output is an int
+ExistsInputParams is a reference to a hash where the following keys are defined:
+	search_core has a value which is a string
+	search_query has a value which is a KBSolrUtil.searchdata
+searchdata is a reference to a hash where the key is a string and the value is a string
+
+
+=end text
+
+
+
+=item Description
+
+The exists_in_solr function that returns 0 or 1
+
+=back
+
+=cut
+
+sub exists_in_solr
+{
+    my $self = shift;
+    my($params) = @_;
+
+    my @_bad_arguments;
+    (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument \"params\" (value was \"$params\")");
+    if (@_bad_arguments) {
+	my $msg = "Invalid arguments passed to exists_in_solr:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'exists_in_solr');
+    }
+
+    my $ctx = $KBSolrUtil::KBSolrUtilServer::CallContext;
+    my($output);
+    #BEGIN exists_in_solr
+    $params = $self->util_initialize_call($params,$ctx);
+    $params = $self->util_args($params,[],{
+        solr_core => "GenomeFeatures_ci",
+        search_query => {q=>"*"},
+    });  
+    my $solrCore = $params->{solr_core}; 
+    my $searchQuery = $params->{search_query};
+    $output = $self->_exists($solrCore, $searchQuery);
+    
+    #END exists_in_solr
+    my @_bad_returns;
+    (!ref($output)) or push(@_bad_returns, "Invalid type for return variable \"output\" (value was \"$output\")");
+    if (@_bad_returns) {
+	my $msg = "Invalid returns passed to exists_in_solr:\n" . join("", map { "\t$_\n" } @_bad_returns);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'exists_in_solr');
+    }
+    return($output);
+}
+
+
 =head2 search_solr
 
   $output = $obj->search_solr($params)
@@ -1131,6 +1211,8 @@ sub search_solr
     }
     return($output);
 }
+
+
 
 
 =head2 status 
@@ -1329,6 +1411,55 @@ doc_data has a value which is a reference to a list where each element is a KBSo
 a reference to a hash where the following keys are defined:
 solr_core has a value which is a string
 doc_data has a value which is a reference to a list where each element is a KBSolrUtil.docdata
+
+
+=end text
+
+=back
+
+
+
+=head2 ExistsInputParams
+
+=over 4
+
+
+
+=item Description
+
+Arguments for the exists_in_solr function - search solr according to the parameters passed and return 1 if found at least one doc 0 if nothing found. A shorter version of search_solr.
+
+string search_core - the name of the solr core to be searched
+searchdata search_query - arbitrary user-supplied key-value pairs specifying the fields to be searched and their values to be matched, a hash which specifies how the documents will be searched, see the example below:
+        search_query={
+                parent_taxon_ref => '1779/116411/1',
+                rank => 'species',
+                scientific_lineage => 'cellular organisms; Bacteria; Proteobacteria; Alphaproteobacteria; Rhizobiales; Bradyrhizobiaceae; Bradyrhizobium',
+                scientific_name => 'Bradyrhizobium sp.*',
+                domain => 'Bacteria'
+        }
+OR, simply:
+        search_query= { q => "*" };
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+search_core has a value which is a string
+search_query has a value which is a KBSolrUtil.searchdata
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+search_core has a value which is a string
+search_query has a value which is a KBSolrUtil.searchdata
 
 
 =end text
