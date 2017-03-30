@@ -31,6 +31,7 @@ use Data::Dumper qw(Dumper);
 use LWP::UserAgent;
 use XML::Simple;
 use Try::Tiny;
+use DateTime;
 
 #The first thing every function should do is call this function
 sub util_initialize_call {
@@ -127,6 +128,33 @@ sub util_timestamp {
 # and, if there is any space in the middle of the string, it replaces the spaces with '*'; for cases when no '*' at the ends of the value string, it adds
 # double quotes to enclose the whole value string (including spaces).
 #
+# parameters:                                                                                                  
+# $searchQuery is a hash which specifies how the documents will be searched, see the example below:
+# $searchQuery={
+#   parent_taxon_ref => '1779/116411/1',
+#   rank => 'species',
+#   scientific_lineage => 'cellular organisms; Bacteria; Proteobacteria; Alphaproteobacteria; Rhizobiales; Bradyrhizobiaceae; Bradyrhizobium',
+#   scientific_name => 'Bradyrhizobium sp. rp3',
+#   domain => 'Bacteria'
+#}
+# OR, simply:
+# $searchQuery= { q => "*" };
+#
+# $searchParams is a hash, see the example below:
+# $searchParams={
+#   fl => 'object_id,gene_name,genome_source',
+#   wt => 'json',
+#   rows => $count,
+#   sort => 'object_id asc',
+#   hl => 'false',
+#   start => $start,
+#   count => $count
+#}
+#
+# $resultFormat is a string indicating what format you want SOLR to return the search results, json, csv, xml, etc.  It overrides the value for 'wt' set in the $searchParams
+#
+# returns a string
+#
 sub _buildQueryString {
     my ($self, $searchQuery, $searchParams, $groupOption, $resultFormat, $skipEscape) = @_;
     $skipEscape = {} unless $skipEscape;
@@ -147,7 +175,7 @@ sub _buildQueryString {
     }    
     foreach my $key (keys %$searchParams) {
         if( $key eq "wt" ) {
-            #do nothing
+            #do nothing, wt is set according to the value of $resultFormat and default to 'xml'
         }
         else {
            $paramFields .= "$key=". URI::Escape::uri_escape($searchParams->{$key}) . "&";
@@ -162,8 +190,9 @@ sub _buildQueryString {
     } else {
         foreach my $key (keys %$searchQuery) {
             $val = $searchQuery->{$key};
-            if( $val =~ m/^\*.*|^\*.*\*$|.*\*$/ ) {#when there is '*' at the ends of the search value
+            if( $val =~ m/^\*.*|^\*.*\*$|.*\*$|.*\*.*/ ) {#when there is '*' at the ends or middle of the search value
                 $val =~ s/\s+/\*/g;#replace the spaces with '*' otherwise without the double quote, spaces will be problematic
+                $val =~ s/\.//g;#remove the periods because SOLR does not handle periods with '*' well
                 if (defined $skipEscape->{$key}) {
                    $qStr .= "+$key:" . $val ." $DEFAULT_FIELD_CONNECTOR ";
                 } else {
