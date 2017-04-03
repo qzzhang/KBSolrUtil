@@ -912,43 +912,6 @@ sub _updateGenomesCore
     }
 }
 
-
-#
-# method name: _getTotalCount
-# Internal method: to fetch the total count of docs that satisfiy the $query in SOLR core named $solrCore.
-# parameters:   
-#     $solrCore: This parameter specifies the Solr core name.
-#     $query: This parameter specifies the constraints in a query hash {key1=>val1, key2=>val2,...} format 
-# return
-#    an integer for the count
-#    -1 for any failure
-#
-#
-sub _getTotalCount
-{
-    my ($self, $solrCore, $query) = @_;
-    
-    my $solrout;
-    my $count;
-    eval {
-        $solrout = $self->search_solr({
-                solr_core => $solrCore, 
-                search_param => {fl=>"*",wt=>"json",rows=>0}, 
-                search_query => $query, 
-                result_format => "json", 
-                group_option => "",
-                skip_escape => {}
-            });
-    };
-    if ($@) {
-        print "ERROR:".$@;
-        return -1;
-    } else {
-        $count = $solrout->{response}->{response}->{numFound};
-    }
-    return $count;
-}
-
 #################### End subs for accessing SOLR #######################
 
 #END_HEADER
