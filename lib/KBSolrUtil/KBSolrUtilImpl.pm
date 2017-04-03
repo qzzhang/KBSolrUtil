@@ -1318,10 +1318,9 @@ sub search_solr
     
     my $queryString = $self->_buildQueryString($searchQuery, $searchParam, $groupOption, $resultFormat, $skipEscape);
     my $solrQuery = $self->{_SOLR_URL}."/".$solrCore."/select?".$queryString;
-    #print "Search string:\n$solrQuery\n";
+    print "Search string:\n$solrQuery\n";
     
     my $solr_response = $self->_sendRequest("$solrQuery", "GET");
-    #print "\nRaw response: \n" . $solr_response->{response} . "\n";
     
     my $responseCode = $self->_parseResponse($solr_response, $resultFormat);
         
@@ -1338,6 +1337,7 @@ sub search_solr
     }
     $output = $solr_response;
 
+    print "\nFinal output: \n" . $output . "\n";
     #END search_solr
     my @_bad_returns;
     (ref($output) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"output\" (value was \"$output\")");
