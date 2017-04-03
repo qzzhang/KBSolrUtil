@@ -842,76 +842,6 @@ sub _error
     return $self->{error};
 }
 
-
-#
-# method name: _updateGenomesCore
-# Internal method: to update the Genomes_* core with the corresponding GenomeFeatures_* core.
-# parameters:   
-#     $src_core: This parameter specifies the source Solr core name.
-#     $dest_core: This parameter specifies the target Solr core name.
-#     $start: This parameter specifies the start row count, default to 0.
-#     $row_count: This parameter specifies the total row count, default to 10.
-#     $gnm_type: This parameter specifies the type of genomes to be updated, default to "KBaseGenomes.Genome-8.2".
-# return
-#    1 for success
-#    0 for any failure
-#
-#
-sub _updateGenomesCore
-{
-    my ($self, $src_core, $dest_core, $start, $row_count, $gnm_type) = @_;
-#=begin    
-    if (!$self->_ping()) {
-        die "\nError--Solr server not responding:\n" . $self->_error->{response};
-    }
-#=cut
-    my $solrgnm;
-    my $ret_gnms;
-    $src_core = "GenomeFeatures_ci" unless $src_core;
-    $dest_core = "Genome_ci" unless $dest_core;
-    $start = 0 unless $start;
-    $row_count = 10 unless $row_count;
-    $gnm_type = "KBaseGenomes.Genome-8.2" unless $gnm_type;
-
-    eval {
-        $solrgnm = $self->search_solr({
-          solr_core => $src_core,
-          search_param => {
-                start => $start,
-                rows => $row_count,
-                wt => 'json'
-          },
-          search_query => {"object_type"=>$gnm_type},
-          result_format => "json",
-          group_option => "",
-          skip_escape => {}
-        });
-    };
-    if ($@) {
-         print "ERROR:".$@;
-         return 0;
-    } else {
-         #print "Search results:" . Dumper($solrgnm->{response}->{response}) . "\n";
-         $ret_gnms = $solrgnm->{response}->{response}->{docs};
-         my $num = $solrgnm->{response}->{response}->{numFound};
-         foreach my $gnm (@{$ret_gnms}) {
-            #push @{$new_gnms},delete $gnm->{_version_};
-            delete $gnm->{_version_};
-         }
-         #then insert the $gnm
-         eval {
-                $self->_addJSON2Solr($dest_core, $ret_gnms);
-         };
-         if ($@) {
-                print "ERROR:".$@;
-                return 0;
-         } else {
-                print "Done updating " . $src_core . " with ". $dest_core. "!";
-                return 1;
-         }
-    }
-}
-
 #################### End subs for accessing SOLR #######################
 
 #END_HEADER
@@ -1318,7 +1248,7 @@ sub search_solr
     
     my $queryString = $self->_buildQueryString($searchQuery, $searchParam, $groupOption, $resultFormat, $skipEscape);
     my $solrQuery = $self->{_SOLR_URL}."/".$solrCore."/select?".$queryString;
-    print "Search string:\n$solrQuery\n";
+    #print "Search string:\n$solrQuery\n";
     
     my $solr_response = $self->_sendRequest("$solrQuery", "GET");
     
@@ -1337,7 +1267,6 @@ sub search_solr
     }
     $output = $solr_response;
 
-    print "\nFinal output: \n" . $output . "\n";
     #END search_solr
     my @_bad_returns;
     (ref($output) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"output\" (value was \"$output\")");
