@@ -1,0 +1,99 @@
+{
+    "ver": "0.0.1",
+    "authors": [
+        "qzhang"
+    ],
+    "contact": "https://kbase.us/contact-us/",
+    "categories": ["active"],
+    "widgets": {
+        "input": null,
+        "output": null
+    },
+    "parameters": [ 
+        {
+            "id": "search_core",
+            "optional": false,
+            "advanced": false,
+            "allow_multiple": false,
+            "default_values": [ "" ],
+            "field_type": "dropdown",
+            "dropdown_options":{
+                "options": [
+                {
+                  "value": "taxonomy",
+                  "display": "taxonomy",
+                  "id": "taxonomy",
+                  "ui_name": "taxonomy"
+                },
+                {
+                  "value": "Genomes_prod",
+                  "display": "Genomes_prod",
+                  "id": "Genomes_prod",
+                  "ui_name": "Genomes_prod"
+                },
+                {
+                  "value": "Genomes_ci",
+                  "display": "Genomes_ci",
+                  "id": "Genomes_ci",
+                  "ui_name": "Genomes_ci"
+                },
+                {
+                  "value": "Reactions",
+                  "display": "Reactions",
+                  "id": "Reactions",
+                  "ui_name": "Reactions"
+                },
+                {
+                  "value": "Roles",
+                  "display": "Roles",
+                  "id": "Roles",
+                  "ui_name": "Roles"
+                }
+              ]
+            }
+        },
+        {
+            "id": "search_query",
+            "optional": false,
+            "advanced": false,
+            "allow_multiple": false,
+            "default_values": [ "{\"q\"=>\"*\"}" ],
+            "field_type": "text",
+            "text_options": {
+                "validate_ws_types": [ "KBSolrUtil.searchdata" ]
+            }
+        }
+    ],
+    "behavior": {
+        "service-mapping": {
+            "url": "",
+            "name": "KBSolrUtil",
+            "method": "get_total_count",
+            "input_mapping": [
+                {
+                    "input_parameter": "search_core",
+                    "target_property": "search_core"
+                },
+                {
+                    "input_parameter": "search_query",
+                    "target_property": "search_query"
+                }
+            ],
+            "output_mapping": [
+                {
+                    "service_method_output_path": [0],
+                    "target_property": "search_result"
+                },
+                {
+                    "input_parameter": "search_core",
+                    "target_property": "search_core"
+                },
+                {
+                    "input_parameter": "search_query",
+                    "target_property": "input_search_query"
+                }
+            ]
+        }
+    },
+    "job_id_output_field": "docker"
+}
