@@ -5,7 +5,7 @@ use Bio::KBase::Exceptions;
 # http://semver.org 
 our $VERSION = '0.0.1';
 our $GIT_URL = 'https://github.com/qzzhang/KBSolrUtil.git';
-our $GIT_COMMIT_HASH = '41c583af5f31adffc71ad407d40f10902e44e27e';
+our $GIT_COMMIT_HASH = '3b64f819acffe74de415e25012436cd366d95be3';
 
 =head1 NAME
 
@@ -1226,6 +1226,8 @@ sub get_total_count
 }
 
 
+
+
 =head2 search_solr
 
   $output = $obj->search_solr($params)
@@ -1343,6 +1345,89 @@ sub search_solr
 	my $msg = "Invalid returns passed to search_solr:\n" . join("", map { "\t$_\n" } @_bad_returns);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
 							       method_name => 'search_solr');
+    }
+    return($output);
+}
+
+
+
+
+=head2 add_json_2solr
+
+  $output = $obj->add_json_2solr($params)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$params is a KBSolrUtil.IndexJsonParams
+$output is an int
+IndexJsonParams is a reference to a hash where the following keys are defined:
+	solr_core has a value which is a string
+	json_data has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$params is a KBSolrUtil.IndexJsonParams
+$output is an int
+IndexJsonParams is a reference to a hash where the following keys are defined:
+	solr_core has a value which is a string
+	json_data has a value which is a string
+
+
+=end text
+
+
+
+=item Description
+
+The add_json_2solr function that returns 1 if succeeded otherwise 0
+
+=back
+
+=cut
+
+sub add_json_2solr
+{
+    my $self = shift;
+    my($params) = @_;
+
+    my @_bad_arguments;
+    (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument \"params\" (value was \"$params\")");
+    if (@_bad_arguments) {
+	my $msg = "Invalid arguments passed to add_json_2solr:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'add_json_2solr');
+    }
+
+    my $ctx = $KBSolrUtil::KBSolrUtilServer::CallContext;
+    my($output);
+    #BEGIN add_json_2solr
+    $params = $self->util_initialize_call($params,$ctx);
+    $params = $self->util_args($params,[],{
+        solr_core => "Genomes_ci",
+        json_data => ""
+    });  
+    my $solrCore = $params->{solr_core};
+    my $docs = $params->{json_data}; 
+    my $output;
+    $output = $self->_addJSON2Solr($solrCore, $docs, 1);    
+
+
+    #END add_json_2solr
+    my @_bad_returns;
+    (!ref($output)) or push(@_bad_returns, "Invalid type for return variable \"output\" (value was \"$output\")");
+    if (@_bad_returns) {
+	my $msg = "Invalid returns passed to add_json_2solr:\n" . join("", map { "\t$_\n" } @_bad_returns);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'add_json_2solr');
     }
     return($output);
 }
@@ -1716,6 +1801,91 @@ search_param has a value which is a KBSolrUtil.searchdata
 search_query has a value which is a KBSolrUtil.searchdata
 result_format has a value which is a string
 group_option has a value which is a string
+
+
+=end text
+
+=back
+
+
+
+=head2 IndexJsonParams
+
+=over 4
+
+
+
+=item Description
+
+Arguments for the add_json_2solr function - send a JSON doc data to solr for indexing
+
+string solr_core - the name of the solr core to index to
+string json_data - the doc to be indexed, a JSON string 
+=for example:
+     $json_data = '[
+     {
+"taxonomy_id":1297193,
+"domain":"Eukaryota",
+"genetic_code":1,
+"embl_code":"CS",
+"division_id":1,
+"inherited_div_flag":1,
+"inherited_MGC_flag":1,
+"parent_taxon_ref":"12570/1217907/1",
+"scientific_name":"Camponotus sp. MAS010",
+"mitochondrial_genetic_code":5,
+"hidden_subtree_flag":0,
+"scientific_lineage":"cellular organisms; Eukaryota; Opisthokonta; Metazoa; Eumetazoa; Bilateria; Protostomia; Ecdysozoa; Panarthropoda; Arthropoda; Mandibulata; Pancrustacea; Hexapoda; Insecta; Dicondylia; Pterygota; Neoptera; Endopterygota; Hymenoptera; Apocrita; Aculeata; Vespoidea; Formicidae; Formicinae; Camponotini; Camponotus",
+"rank":"species",
+"ws_ref":"12570/1253105/1",
+"kingdom":"Metazoa",
+"GenBank_hidden_flag":1,
+"inherited_GC_flag":1,"
+"deleted":0
+      },
+      {
+"inherited_MGC_flag":1,
+"inherited_div_flag":1,
+"parent_taxon_ref":"12570/1217907/1",
+"genetic_code":1,
+"division_id":1,
+"embl_code":"CS",
+"domain":"Eukaryota",
+"taxonomy_id":1297190,
+"kingdom":"Metazoa",
+"GenBank_hidden_flag":1,
+"inherited_GC_flag":1,
+"ws_ref":"12570/1253106/1",
+"scientific_lineage":"cellular organisms; Eukaryota; Opisthokonta; Metazoa; Eumetazoa; Bilateria; Protostomia; Ecdysozoa; Panarthropoda; Arthropoda; Mandibulata; Pancrustacea; Hexapoda; Insecta; Dicondylia; Pterygota; Neoptera; Endopterygota; Hymenoptera; Apocrita; Aculeata; Vespoidea; Formicidae; Formicinae; Camponotini; Camponotus",
+"rank":"species",
+"scientific_name":"Camponotus sp. MAS003",
+"hidden_subtree_flag":0,
+"mitochondrial_genetic_code":5,
+"deleted":0
+      },
+...
+  ]';
+=cut end of example
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+solr_core has a value which is a string
+json_data has a value which is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+solr_core has a value which is a string
+json_data has a value which is a string
 
 
 =end text
