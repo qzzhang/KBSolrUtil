@@ -1,0 +1,41 @@
+#
+# define display information
+#
+name: Add JSON to SOLR
+tooltip: |
+    Indexing JSON formatted string in SOLR
+screenshots: []
+
+icon: icon.png
+
+#
+# define a set of similar methods that might be useful to the user
+#
+suggestions:
+    apps:
+        related:
+            []
+        next:
+            []
+    methods:
+        related:
+            []
+        next:
+            []
+
+#
+# Configure the display and description of parameters
+#
+parameters :
+    solr_core :
+        ui-name : |
+            Solr Database Name
+        short-hint : |
+            The core name of the target Solr database 
+    json_data :
+        ui-name : |
+            JSON docs in a string
+        short-hint : |
+            Specifies the JSON docs in a string, can be inside an array, such as '[{json_doc1}, {json_doc2},...]'
+description : |
+    <p>Send and index JSON doc data into a SOLR database.</p>
