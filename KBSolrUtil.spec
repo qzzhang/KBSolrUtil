@@ -62,6 +62,32 @@ module KBSolrUtil {
     */
     funcdef exists_in_solr(ExistsInputParams params) returns (int output) authentication required;
     
+    
+    /*
+        Arguments for the get_total_count function - search solr according to the parameters passed and return the count of docs found, or -1 if error.
+        
+        string search_core - the name of the solr core to be searched
+        searchdata search_query - arbitrary user-supplied key-value pairs specifying the fields to be searched and their values to be matched, a hash which specifies how the documents will be searched, see the example below:
+                search_query={
+                        parent_taxon_ref => '1779/116411/1',
+                        rank => 'species',
+                        scientific_lineage => 'cellular organisms; Bacteria; Proteobacteria; Alphaproteobacteria; Rhizobiales; Bradyrhizobiaceae; Bradyrhizobium',
+                        scientific_name => 'Bradyrhizobium sp.*',
+                        domain => 'Bacteria'
+                }
+        OR, simply:
+                search_query= { q => "*" };
+    */
+    typedef structure {
+       string search_core;
+       searchdata search_query;
+    } TotalCountParams;
+
+    /*
+        The get_total_count function that returns a positive integer (including 0) or -1
+    */
+    funcdef get_total_count(TotalCountParams params) returns (int output) authentication required;
+
     /*
         Arguments for the search_solr function - search solr according to the parameters passed and return a string
         

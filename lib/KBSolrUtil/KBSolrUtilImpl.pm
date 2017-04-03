@@ -5,7 +5,7 @@ use Bio::KBase::Exceptions;
 # http://semver.org 
 our $VERSION = '0.0.1';
 our $GIT_URL = 'https://github.com/qzzhang/KBSolrUtil.git';
-our $GIT_COMMIT_HASH = '239f4358383d6427b6c71e2fe0538bc97f9c3cd5';
+our $GIT_COMMIT_HASH = '41c583af5f31adffc71ad407d40f10902e44e27e';
 
 =head1 NAME
 
@@ -484,7 +484,7 @@ sub _addJSON2Solr
     }
     
     my $commit = $self->{_AUTOCOMMIT} ? 'true' : 'false';
-    my $url = "$self->{_SOLR_URL}/$solrCore/update/json?commit=true";# . $commit; 
+    my $url = "$self->{_SOLR_URL}/$solrCore/update/json?commit=false";# . $commit; 
 #=begin
     my $response = $self->_sendRequest($url, 'POST', 'binary', $self->{_CT_JSON}, $docs);
 
@@ -496,7 +496,13 @@ sub _addJSON2Solr
             return 0;
     }
 #=cut
-    return 1;
+    if (!$self->_commit($solrCore)) {
+        die $self->_error->{response};
+        return 0;
+    }
+    else {
+        return 1;
+    }
 }
 
 #
@@ -906,6 +912,43 @@ sub _updateGenomesCore
     }
 }
 
+
+#
+# method name: _getTotalCount
+# Internal method: to fetch the total count of docs that satisfiy the $query in SOLR core named $solrCore.
+# parameters:   
+#     $solrCore: This parameter specifies the Solr core name.
+#     $query: This parameter specifies the constraints in a query hash {key1=>val1, key2=>val2,...} format 
+# return
+#    an integer for the count
+#    -1 for any failure
+#
+#
+sub _getTotalCount
+{
+    my ($self, $solrCore, $query) = @_;
+    
+    my $solrout;
+    my $count;
+    eval {
+        $solrout = $self->search_solr({
+                solr_core => $solrCore, 
+                search_param => {fl=>"*",wt=>"json",rows=>0}, 
+                search_query => $query, 
+                result_format => "json", 
+                group_option => "",
+                skip_escape => {}
+            });
+    };
+    if ($@) {
+        print "ERROR:".$@;
+        return -1;
+    } else {
+        $count = $solrout->{response}->{response}->{numFound};
+    }
+    return $count;
+}
+
 #################### End subs for accessing SOLR #######################
 
 #END_HEADER
@@ -1115,6 +1158,106 @@ sub exists_in_solr
 	my $msg = "Invalid returns passed to exists_in_solr:\n" . join("", map { "\t$_\n" } @_bad_returns);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
 							       method_name => 'exists_in_solr');
+    }
+    return($output);
+}
+
+
+
+
+=head2 get_total_count
+
+  $output = $obj->get_total_count($params)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$params is a KBSolrUtil.TotalCountParams
+$output is an int
+TotalCountParams is a reference to a hash where the following keys are defined:
+	search_core has a value which is a string
+	search_query has a value which is a KBSolrUtil.searchdata
+searchdata is a reference to a hash where the key is a string and the value is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$params is a KBSolrUtil.TotalCountParams
+$output is an int
+TotalCountParams is a reference to a hash where the following keys are defined:
+	search_core has a value which is a string
+	search_query has a value which is a KBSolrUtil.searchdata
+searchdata is a reference to a hash where the key is a string and the value is a string
+
+
+=end text
+
+
+
+=item Description
+
+The get_total_count function that returns a positive integer (including 0) or -1
+
+=back
+
+=cut
+
+sub get_total_count
+{
+    my $self = shift;
+    my($params) = @_;
+
+    my @_bad_arguments;
+    (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument \"params\" (value was \"$params\")");
+    if (@_bad_arguments) {
+	my $msg = "Invalid arguments passed to get_total_count:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'get_total_count');
+    }
+
+    my $ctx = $KBSolrUtil::KBSolrUtilServer::CallContext;
+    my($output);
+    #BEGIN get_total_count
+    $params = $self->util_initialize_call($params,$ctx);
+    $params = $self->util_args($params,[],{
+        search_core => "Genomes_ci",
+        search_query => {q=>"*"}
+    });  
+    my $solrCore = $params->{search_core};
+    my $query = $params->{search_query};
+    
+    my $solrout;
+    my $output;
+    eval {
+        $solrout = $self->search_solr({
+                solr_core => $solrCore, 
+                search_param => {fl=>"*",wt=>"json",rows=>0}, 
+                search_query => $query, 
+                result_format => "json", 
+                group_option => "",
+                skip_escape => {}
+            });
+    };
+    if ($@) {
+        print "ERROR:".$@;
+        $output = -1;
+    } else {
+        $output = $solrout->{response}->{response}->{numFound};
+    }
+    #END get_total_count
+    my @_bad_returns;
+    (!ref($output)) or push(@_bad_returns, "Invalid type for return variable \"output\" (value was \"$output\")");
+    if (@_bad_returns) {
+	my $msg = "Invalid returns passed to get_total_count:\n" . join("", map { "\t$_\n" } @_bad_returns);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'get_total_count');
     }
     return($output);
 }
@@ -1457,6 +1600,55 @@ doc_data has a value which is a reference to a list where each element is a KBSo
 =item Description
 
 Arguments for the exists_in_solr function - search solr according to the parameters passed and return 1 if found at least one doc 0 if nothing found. A shorter version of search_solr.
+
+string search_core - the name of the solr core to be searched
+searchdata search_query - arbitrary user-supplied key-value pairs specifying the fields to be searched and their values to be matched, a hash which specifies how the documents will be searched, see the example below:
+        search_query={
+                parent_taxon_ref => '1779/116411/1',
+                rank => 'species',
+                scientific_lineage => 'cellular organisms; Bacteria; Proteobacteria; Alphaproteobacteria; Rhizobiales; Bradyrhizobiaceae; Bradyrhizobium',
+                scientific_name => 'Bradyrhizobium sp.*',
+                domain => 'Bacteria'
+        }
+OR, simply:
+        search_query= { q => "*" };
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+search_core has a value which is a string
+search_query has a value which is a KBSolrUtil.searchdata
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+search_core has a value which is a string
+search_query has a value which is a KBSolrUtil.searchdata
+
+
+=end text
+
+=back
+
+
+
+=head2 TotalCountParams
+
+=over 4
+
+
+
+=item Description
+
+Arguments for the get_total_count function - search solr according to the parameters passed and return the count of docs found, or -1 if error.
 
 string search_core - the name of the solr core to be searched
 searchdata search_query - arbitrary user-supplied key-value pairs specifying the fields to be searched and their values to be matched, a hash which specifies how the documents will be searched, see the example below:
