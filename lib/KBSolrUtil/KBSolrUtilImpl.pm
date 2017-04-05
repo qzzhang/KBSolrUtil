@@ -3,9 +3,9 @@ use strict;
 use Bio::KBase::Exceptions;
 # Use Semantic Versioning (2.0.0-rc.1)
 # http://semver.org 
-our $VERSION = '0.0.1';
+our $VERSION = '0.0.2';
 our $GIT_URL = 'https://github.com/qzzhang/KBSolrUtil.git';
-our $GIT_COMMIT_HASH = '3b64f819acffe74de415e25012436cd366d95be3';
+our $GIT_COMMIT_HASH = '1aaf5fc579341194fbc9e5e867fb321e967da7e6';
 
 =head1 NAME
 
