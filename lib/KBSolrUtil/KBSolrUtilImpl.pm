@@ -21,6 +21,7 @@ This module contains the utility methods and configuration details to access the
 #BEGIN_HEADER
 use Bio::KBase::AuthToken;
 use Workspace::WorkspaceClient;
+use Bio::KBase::HandleService;
 #use Bio::KBase::Workspace::Client;
 use Config::IniFiles;
 use Config::Simple;
@@ -45,11 +46,16 @@ sub util_initialize_call {
     my $cfg = Config::IniFiles->new(-file=>$config_file);
     $self->{data} = $cfg->val('KBSolrUtil','data');
     $self->{scratch} = $cfg->val('KBSolrUtil','scratch');
-    $self->{workspace_url} = $cfg->val('KBSolrUtil','workspace-url');
-    die "no workspace-url defined" unless $self->{workspace_url};
-
+    $self->{'workspace-url'} = $cfg->val('KBSolrUtil','workspace-url');
+    die "no workspace-url defined" unless $self->{'workspace-url'};
+    $self->{'shock-url'} = $cfg->val('KBSolrUtil','shock-url');
+    die "no shock-url defined" unless $self->{'shock-url'};
+    $self->{'handle-service-url'} = $cfg->val('KBSolrUtil','handle-service-url');
+    die "no handle-service-url defined" unless $self->{'handle-service-url'};
+    $self->{'auth-service-url'} = $cfg->val('KBSolrUtil','auth-service-url');#,"https://kbase.us/services/authorization/Sessions/Login");
+    die "no auth-service-url defined" unless $self->{'auth-service-url'};
     $self->util_timestamp(DateTime->now()->datetime());
-    $self->{_wsclient} = new Workspace::WorkspaceClient($self->{workspace_url},token => $ctx->token());
+    $self->{_wsclient} = new Workspace::WorkspaceClient($self->{'workspace-url'},token => $ctx->token());
     return $params;
 }
 
