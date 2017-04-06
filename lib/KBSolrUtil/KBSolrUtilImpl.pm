@@ -52,8 +52,6 @@ sub util_initialize_call {
     die "no shock-url defined" unless $self->{'shock-url'};
     $self->{'handle-service-url'} = $cfg->val('KBSolrUtil','handle-service-url');
     die "no handle-service-url defined" unless $self->{'handle-service-url'};
-    $self->{'auth-service-url'} = $cfg->val('KBSolrUtil','auth-service-url');#,"https://kbase.us/services/authorization/Sessions/Login");
-    die "no auth-service-url defined" unless $self->{'auth-service-url'};
     $self->util_timestamp(DateTime->now()->datetime());
     $self->{_wsclient} = new Workspace::WorkspaceClient($self->{'workspace-url'},token => $ctx->token());
     return $params;
