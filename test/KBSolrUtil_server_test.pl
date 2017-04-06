@@ -5,7 +5,6 @@ use Config::Simple;
 use Time::HiRes qw(time);
 use Bio::KBase::AuthToken;
 use Workspace::WorkspaceClient;
-#use Bio::KBase::workspace::Client;
 use KBSolrUtil::KBSolrUtilImpl;
 
 local $| = 1;
@@ -52,7 +51,7 @@ sub get_ws_name {
 =cut   
 
 eval {
-=begin
+#=begin
     my $solrgnm;
     my $ret_gnms;
     eval {
@@ -90,7 +89,7 @@ eval {
         }
     }
     ok(defined($solrgnm),"_addJSON2Solr completed.");
-=cut   
+#=cut   
 
 =begin
     my $solrcount;
@@ -287,7 +286,7 @@ eval {
     ok(defined($jsonret)," JSON indexing succeeded.");
 =cut
 
-#=begin 
+=begin 
     eval {
         $jsonret = $impl->add_json_2solr({solr_core=>"BiochemData", json_data=>$json_out});
     };
@@ -298,7 +297,7 @@ eval {
          print Dumper($jsonret) ."\n";
     }
     ok(defined($jsonret)," JSON indexing succeeded.");
-#=cut
+=cut
 
 =begin
     my $xmlret; 
