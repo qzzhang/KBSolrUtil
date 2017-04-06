@@ -15,7 +15,10 @@ my $config = new Config::Simple($config_file)->get_block('KBSolrUtil');
 my $ws_url = $config->{"workspace-url"};
 my $ws_name = undef;
 my $ws_client = new Workspace::WorkspaceClient($ws_url,token => $token);
-my $auth_token = Bio::KBase::AuthToken->new(token => $token, ignore_authrc => 1);
+my $auth_token = Bio::KBase::AuthToken->new(token => $token, ignore_authrc => 1, auth_svc=>$config->{'auth-service-url'});
+print("ws url:".$config->{'workspace-url'} . "\n");
+print("auth url:".$config->{'auth-service-url'} . "\n");
+
 my $ctx = LocalCallContext->new($token, $auth_token->user_id);
 $KBSolrUtil::KBSolrUtilServer::CallContext = $ctx;
 my $impl = new KBSolrUtil::KBSolrUtilImpl();
@@ -29,15 +32,34 @@ sub get_ws_name {
     return $ws_name;
 }
 
+=begin
+    my $exists_ret;
+    eval {
+        $exists_ret = $impl->exists_in_solr({
+          solr_core => "GenomeFeatures_prod",
+          search_query => {"object_type"=>"KBaseGenomes.Genome-8.2",
+                           "genome_id"=>"GCF_000518705.1"
+                     }
+        });
+    };
+    ok(!$@, "exists_in_solr command successful");
+    if ($@) { 
+         print "ERROR:".$@;
+    } else {
+         print $exists_ret ."\n";
+    }
+    ok(defined($exists_ret),"_exists_in_solr command returned result.");
+=cut   
+
 eval {
-#=begin
+=begin
     my $solrgnm;
     my $ret_gnms;
     eval {
         $solrgnm = $impl->search_solr({
           solr_core => "GenomeFeatures_prod",
           search_param => {
-                rows => 67058,
+                rows => 100000,
                 wt => 'json'
           },
           search_query => {"object_type"=>'KBaseGenomes.Genome-8.2'},
@@ -53,8 +75,7 @@ eval {
          #print "Search results:" . Dumper($solrgnm->{response}->{response}) . "\n";
          $ret_gnms = $solrgnm->{response}->{response}->{docs};
          my $num = $solrgnm->{response}->{response}->{numFound};
-         foreach my $gnm (@{$ret_gnms}) {
-            #push @{$new_gnms},delete $gnm->{_version_};
+         foreach my $gnm (@{$ret_gnms}) {#remove the _version_ field added by SOLR
             delete $gnm->{_version_};
          }
          #then insert the $gnm
@@ -69,7 +90,24 @@ eval {
         }
     }
     ok(defined($solrgnm),"_addJSON2Solr completed.");
-#=cut   
+=cut   
+
+=begin
+    my $solrcount;
+    eval {
+        $solrcount = $impl->get_total_count({
+          search_core => "Reactions",
+          search_query => {'abbreviation'=>'RXNQT-4349.c'} #{q=>"*"}
+        });  
+    };
+    ok(!$@, "get_total_count command successful");
+    if ($@) { 
+         print "ERROR:".$@;
+    } else {
+         print $solrcount ."\n";
+    }
+    ok(defined($solrcount),"get_total_count command returned result.");
+=cut   
 
 =begin
     my $solrret;
@@ -248,6 +286,20 @@ eval {
     }
     ok(defined($jsonret)," JSON indexing succeeded.");
 =cut
+
+#=begin 
+    eval {
+        $jsonret = $impl->add_json_2solr({solr_core=>"BiochemData", json_data=>$json_out});
+    };
+    ok(!$@, "add_json_2solr command successful");
+    if ($@) { 
+         print "ERROR:".$@;
+    } else {
+         print Dumper($jsonret) ."\n";
+    }
+    ok(defined($jsonret)," JSON indexing succeeded.");
+#=cut
+
 =begin
     my $xmlret; 
     eval {
