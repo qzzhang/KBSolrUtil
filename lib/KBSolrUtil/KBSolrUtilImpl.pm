@@ -32,7 +32,6 @@ use Data::Dumper qw(Dumper);
 use LWP::UserAgent;
 use XML::Simple;
 use Try::Tiny;
-
 use DateTime;
 
 #The first thing every function should do is call this function
@@ -880,7 +879,6 @@ sub new
 }
 
 =head1 METHODS
-
 
 
 =head2 index_in_solr
