@@ -1,0 +1,41 @@
+#
+# define display information
+#
+name: Check existence in SOLR
+tooltip: |
+    Checks if any document exists in SOLR by specifying search criteria
+screenshots: []
+
+icon: icon.png
+
+#
+# define a set of similar methods that might be useful to the user
+#
+suggestions:
+    apps:
+        related:
+            []
+        next:
+            []
+    methods:
+        related:
+            []
+        next:
+            []
+
+#
+# Configure the display and description of parameters
+#
+parameters :
+    search_core :
+        ui-name : |
+            Solr Database Name
+        short-hint : |
+            The core name of the target Solr database 
+    search_query :
+        ui-name : |
+            Search Criteria
+        short-hint : |
+            Specifies the criteria in a list of key=>value pairs
+description : |
+    <p>The exists_in_solr method is implemented for checking if any document with the given search query exists in the given SOLR database.</p>

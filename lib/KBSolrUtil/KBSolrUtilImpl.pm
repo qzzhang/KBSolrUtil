@@ -767,6 +767,8 @@ sub _rollback
 #   scientific_name => 'Bradyrhizobium sp. rp3',
 #   domain => 'Bacteria'
 #}
+# $solrCore is a string that represents the name of the SOLR core
+#
 # returns :
 #    1 for yes (document match found) 
 #    0 for any failure
