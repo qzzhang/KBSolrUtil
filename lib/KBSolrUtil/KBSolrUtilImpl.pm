@@ -784,6 +784,7 @@ sub _exists
     my $queryString = $self->_buildQueryString($searchCriteria);
     my $url = $self->{_SOLR_URL}."/$solrCore/select?";
     $url = $url. $queryString;
+    print "Exists checking query:" . $queryString;
     my $response = $self->_sendRequest($url, 'GET');
     my $status = $self->_parseResponse($response);
     if ($status == 1) {
