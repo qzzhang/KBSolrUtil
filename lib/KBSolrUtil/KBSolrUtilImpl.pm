@@ -1043,10 +1043,10 @@ sub exists_in_solr
     #BEGIN exists_in_solr
     $params = $self->util_initialize_call($params,$ctx);
     $params = $self->util_args($params,[],{
-        solr_core => "GenomeFeatures_ci",
+        search_core => "GenomeFeatures_ci",
         search_query => {q=>"*"},
     });  
-    my $solrCore = $params->{solr_core}; 
+    my $solrCore = $params->{search_core}; 
     my $searchQuery = $params->{search_query};
     $output = $self->_exists($solrCore, $searchQuery);
     
