@@ -1256,7 +1256,7 @@ sub search_solr
     print "Search string:\n$solrQuery\n";
     
     my $solr_response = $self->_sendRequest("$solrQuery", "GET");
-print "response: " . $solr_reponse;    
+print "response: " . $solr_response;    
     my $responseCode = $self->_parseResponse($solr_response, $resultFormat);
         
     if ($responseCode) {
