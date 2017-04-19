@@ -1048,6 +1048,7 @@ sub exists_in_solr
     });  
     my $solrCore = $params->{search_core}; 
     my $searchQuery = $params->{search_query};
+    
     $output = $self->_exists($solrCore, $searchQuery);
     
     #END exists_in_solr

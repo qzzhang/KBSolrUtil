@@ -35,7 +35,7 @@ sub get_ws_name {
     my $exists_ret;
     eval {
         $exists_ret = $impl->exists_in_solr({
-          solr_core => "GenomeFeatures_prod",
+          search_core => "GenomeFeatures_prod",
           search_query => {"object_type"=>"KBaseGenomes.Genome-8.2",
                            "genome_id"=>"GCF_000518705.1"
                      }
