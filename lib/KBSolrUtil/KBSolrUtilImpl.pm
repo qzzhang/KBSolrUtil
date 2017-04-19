@@ -1253,10 +1253,10 @@ sub search_solr
     
     my $queryString = $self->_buildQueryString($searchQuery, $searchParam, $groupOption, $resultFormat, $skipEscape);
     my $solrQuery = $self->{_SOLR_URL}."/".$solrCore."/select?".$queryString;
-    #print "Search string:\n$solrQuery\n";
+    print "Search string:\n$solrQuery\n";
     
     my $solr_response = $self->_sendRequest("$solrQuery", "GET");
-    
+print "response: " . $solr_reponse;    
     my $responseCode = $self->_parseResponse($solr_response, $resultFormat);
         
     if ($responseCode) {
