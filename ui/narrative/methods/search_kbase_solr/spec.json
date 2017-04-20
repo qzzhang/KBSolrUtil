@@ -81,7 +81,7 @@
             "optional": false,
             "advanced": false,
             "allow_multiple": false,
-            "default_values": [ "{\"q\"=>\"*\"}" ],
+            "default_values": [ "{q=>\"*\"}" ],
             "field_type": "text",
             "text_options": {
                 "validate_ws_types": [ "KBSolrUtil.searchdata" ]
@@ -92,7 +92,7 @@
             "optional": true,
             "advanced": false,
             "allow_multiple": false,
-            "default_values": [ "{fl=>*,start=>0,rows=>10}" ],
+            "default_values": [ "{fl=>\"*\",start=>0,rows=>10}" ],
             "field_type": "text",
             "text_options": {
                 "validate_ws_types": [ "KBSolrUtil.searchdata" ]
@@ -152,12 +152,12 @@
                 },
                 {
                     "input_parameter": "search_query",
-                    "target_type_transform": "resolved-ref",
+                    "target_type_transform": "object-name",
                     "target_property": "search_query"
                 },
                 {
                     "input_parameter": "search_param",
-                    "target_type_transform": "resolved-ref",
+                    "target_type_transform": "object-name", 
                     "target_property": "search_param"
                 },
                 {
