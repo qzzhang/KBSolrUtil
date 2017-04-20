@@ -38,14 +38,14 @@ parameters :
         short-hint : |
             Specifies the criteria in a list of key=>value pairs
         long-hint : |
-            For example: "search_query={parent_taxon_ref=>'1779/116411/1',rank=>'species',scientific_lineage=>'cellular organisms; Bacteria; Proteobacteria; Alphaproteobacteria; Rhizobiales; Bradyrhizobiaceae; Bradyrhizobium',scientific_name=>'Bradyrhizobium sp.*',domain => 'Bacteria'}"
+            For example (please remove double quotes): "search_query={parent_taxon_ref=>'1779/116411/1',rank=>'species',scientific_lineage=>'cellular organisms; Bacteria; Proteobacteria; Alphaproteobacteria; Rhizobiales; Bradyrhizobiaceae; Bradyrhizobium',scientific_name=>'Bradyrhizobium sp.*',domain => 'Bacteria'}"
     search_param :
         ui-name : |
             Result Display
         short-hint : |
             For controlling the presentation of the query response
         long-hint : |
-            For example: "search_param={fl=>'taxonomy_id,domain,scientific_name',rows=>20,sort=>'taxonomy_id asc',start=>100}"
+            For example (please remove double quotes): "search_param={fl=>'taxonomy_id,domain,scientific_name',rows=>20,sort=>'taxonomy_id asc',start=>100}"
 
     result_format :
         ui-name : |
