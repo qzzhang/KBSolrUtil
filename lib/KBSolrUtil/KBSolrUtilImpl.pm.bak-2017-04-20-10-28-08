@@ -1212,7 +1212,7 @@ solrresponse is a reference to a hash where the key is a string and the value is
 
 =item Description
 
-The search_solr function that returns a solrresponse consisting of a string in the format of the Perl structure (hash)
+The search_solr function that returns a solrresponse consisting of a string in the format of the specified 'result_format' in SearchSolrParams
 
 =back
 
@@ -1281,116 +1281,6 @@ sub search_solr
 	my $msg = "Invalid returns passed to search_solr:\n" . join("", map { "\t$_\n" } @_bad_returns);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
 							       method_name => 'search_solr');
-    }
-    return($output);
-}
-
-
-
-
-=head2 search_kbase_solr
-
-  $output = $obj->search_kbase_solr($params)
-
-=over 4
-
-=item Parameter and return types
-
-=begin html
-
-<pre>
-$params is a KBSolrUtil.SearchSolrParams
-$output is a KBSolrUtil.solrresponse
-SearchSolrParams is a reference to a hash where the following keys are defined:
-	search_core has a value which is a string
-	search_param has a value which is a KBSolrUtil.searchdata
-	search_query has a value which is a KBSolrUtil.searchdata
-	result_format has a value which is a string
-	group_option has a value which is a string
-searchdata is a reference to a hash where the key is a string and the value is a string
-solrresponse is a reference to a hash where the key is a string and the value is a string
-
-</pre>
-
-=end html
-
-=begin text
-
-$params is a KBSolrUtil.SearchSolrParams
-$output is a KBSolrUtil.solrresponse
-SearchSolrParams is a reference to a hash where the following keys are defined:
-	search_core has a value which is a string
-	search_param has a value which is a KBSolrUtil.searchdata
-	search_query has a value which is a KBSolrUtil.searchdata
-	result_format has a value which is a string
-	group_option has a value which is a string
-searchdata is a reference to a hash where the key is a string and the value is a string
-solrresponse is a reference to a hash where the key is a string and the value is a string
-
-
-=end text
-
-
-
-=item Description
-
-The search_kbase_solr function that returns a solrresponse consisting of a string in the format of the specified 'result_format' in SearchSolrParams
-The interface is exactly the same as that of search_solr, except the output content will be different. And this function is exposed to the narrative for users to search KBase Solr databases, while search_solr will be mainly serving RDM.
-
-=back
-
-=cut
-
-sub search_kbase_solr
-{
-    my $self = shift;
-    my($params) = @_;
-
-    my @_bad_arguments;
-    (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument \"params\" (value was \"$params\")");
-    if (@_bad_arguments) {
-	my $msg = "Invalid arguments passed to search_kbase_solr:\n" . join("", map { "\t$_\n" } @_bad_arguments);
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-							       method_name => 'search_kbase_solr');
-    }
-
-    my $ctx = $KBSolrUtil::KBSolrUtilServer::CallContext;
-    my($output);
-    #BEGIN search_kbase_solr
-    $params = $self->util_initialize_call($params,$ctx);
-    $params = $self->util_args($params,[],{
-        solr_core => "GenomeFeatures_ci",
-        search_param => {},
-        search_query => {q=>"*"},
-        result_format => "xml",
-        group_option => "",
-        skip_escape => {}
-    });  
-    my $solrCore = $params->{solr_core}; 
-    my $searchParam = $params->{search_param};
-    my $searchQuery = $params->{search_query};
-    my $resultFormat = $params->{result_format};
-    my $groupOption = $params->{group_option};
-    my $skipEscape = $params->{skip_escape};
-    
-    if (!$self->_ping()) {
-        die "\nError--Solr server not responding:\n" . $self->_error->{response};
-    }
-
-    my $queryString = $self->_buildQueryString($searchQuery, $searchParam, $groupOption, $resultFormat, $skipEscape);
-    print "Search query string:\n$queryString\n";
-    my $solrQuery = $self->{_SOLR_URL}."/".$solrCore."/select?".$queryString;
-    
-    my $solr_response = $self->_sendRequest("$solrQuery", "GET");
-    $output = {solr_search_result=>$solr_response->{response}};
-
-    #END search_kbase_solr
-    my @_bad_returns;
-    (ref($output) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"output\" (value was \"$output\")");
-    if (@_bad_returns) {
-	my $msg = "Invalid returns passed to search_kbase_solr:\n" . join("", map { "\t$_\n" } @_bad_returns);
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-							       method_name => 'search_kbase_solr');
     }
     return($output);
 }

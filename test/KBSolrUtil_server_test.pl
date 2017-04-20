@@ -129,9 +129,10 @@ eval {
     ok(defined($solrret),"_search_solr command returned result.");
 =cut   
 
-=begin 
+#=begin
+   my $solrret; 
     eval {
-        $solrret = $impl->search_solr({
+        $solrret = $impl->search_kbase_solr({
           solr_core => "taxonomy_ci",
           search_param => {
                 fl => 'taxonomy_id,domain,aliases',
@@ -149,19 +150,19 @@ eval {
                 scientific_name => 'Bradyrhizobium sp. *',
                 domain => 'Bacteria'
           },
-          result_format => "json",
+          result_format => "xml",
           group_option => "",
           skip_escape => {}
         });  
     };
-    ok(!$@, "search_solr command successful");
+    ok(!$@, "search_kbase_solr command successful");
     if ($@) { 
          print "ERROR:".$@;
     } else {
          print Dumper($solrret) ."\n";
     }
-    ok(defined($solrret),"_search_solr command returned result.");
-=cut
+    ok(defined($solrret),"search_kbase_solr command returned result.");
+#=cut
 
     my $inputObjs = [ 
       {
@@ -286,7 +287,7 @@ eval {
     ok(defined($jsonret)," JSON indexing succeeded.");
 =cut
 
-#=begin 
+=begin 
     eval {
         $jsonret = $impl->add_json_2solr({solr_core=>"BiochemData", json_data=>$json_out});
     };

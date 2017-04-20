@@ -6,8 +6,8 @@
     "contact": "https://kbase.us/contact-us/",
     "categories": ["active"],
     "widgets": {
-        "input": null,
-        "output": null
+        "input": "kbaseNarrativeMethodInput",
+        "output" : "no-display"
     },
     "parameters": [ 
         {
@@ -20,19 +20,49 @@
             "dropdown_options":{
                 "options": [
                 {
-                  "value": "taxonomy",
-                  "display": "taxonomy",
-                  "id": "taxonomy",
-                  "ui_name": "taxonomy"
+                  "value": "taxonomy in CI",
+                  "display": "taxonomy_ci",
+                  "id": "taxonomy_ci",
+                  "ui_name": "taxonomy_ci"
                 },
                 {
-                  "value": "genomes",
-                  "display": "genomes",
-                  "id": "genomes",
-                  "ui_name": "genomes"
+                  "value": "taxonomy in production",
+                  "display": "taxonomy_prod",
+                  "id": "taxonomy_prod",
+                  "ui_name": "taxonomy_prod"
                 },
                 {
-                  "value": "Reactions",
+                  "value": "GenomeFeatures_ci",
+                  "display": "Genome Features in CI",
+                  "id": "GenomeFeatures_ci",
+                  "ui_name": "GenomeFeatures_ci"
+                },
+                {
+                  "value": "Genomes_ci",
+                  "display": "Genomes in CI",
+                  "id": "Genomes_ci",
+                  "ui_name": "Genomes_ci"
+                },
+                {
+                  "value": "Genomes_prod",
+                  "display": "Genomes in production",
+                  "id": "Genomes_prod",
+                  "ui_name": "Genomes_prod"
+                },
+                {
+                  "value": "Biochemical Compounds",
+                  "display": "Compounds",
+                  "id": "Compounds",
+                  "ui_name": "Compounds"
+                },
+                {
+                  "value": "Subsystems",
+                  "display": "Subsystems",
+                  "id": "Subsystems",
+                  "ui_name": "Subsystems"
+                },
+                {
+                  "value": "Biochemical Reactions",
                   "display": "Reactions",
                   "id": "Reactions",
                   "ui_name": "Reactions"
@@ -62,7 +92,7 @@
             "optional": true,
             "advanced": false,
             "allow_multiple": false,
-            "default_values": [ "{\"fl\"=>\"genome_id,genome_source\"}" ],
+            "default_values": [ "{fl=>*,start=>0,rows=>10}" ],
             "field_type": "text",
             "text_options": {
                 "validate_ws_types": [ "KBSolrUtil.searchdata" ]
@@ -95,7 +125,7 @@
         "service-mapping": {
             "url": "",
             "name": "KBSolrUtil",
-            "method": "search_solr",
+            "method": "search_kbase_solr",
             "input_mapping": [
                 {
                     "input_parameter": "search_core",
@@ -116,32 +146,20 @@
                 {
                     "input_parameter": "result_format",
                     "target_property": "result_format"
+                },
+                {
+                    "narrative_system_variable": "workspace",
+                    "target_property": "workspace"
                 }
             ],
             "output_mapping": [
                 {
-                    "service_method_output_path": [0],
+                    "service_method_output_path": [0, "search_result"],
                     "target_property": "search_result"
                 },
                 {
-                    "input_parameter": "search_core",
-                    "target_property": "search_core"
-                },
-                {
-                    "input_parameter": "search_query",
-                    "target_property": "input_search_query"
-                },
-                {
-                    "narrative_system_variable": "search_param",
-                    "target_property": "input_search_param"
-                },
-                {
-                    "input_parameter": "group_option",
-                    "target_property": "input_group_option"
-                },
-                {
-                    "narrative_system_variable": "result_format",
-                    "target_property": "input_result_format"
+                "narrative_system_variable": "workspace",
+                    "target_property": "workspace_name"
                 }
             ]
         }

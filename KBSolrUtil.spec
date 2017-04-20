@@ -129,10 +129,15 @@ module KBSolrUtil {
     } SearchSolrParams;
 
     /*
-        The search_solr function that returns a solrresponse consisting of a string in the format of the specified 'result_format' in SearchSolrParams
+        The search_solr function that returns a solrresponse consisting of a string in the format of the Perl structure (hash)
     */
     funcdef search_solr(SearchSolrParams params) returns (solrresponse output) authentication required;
 
+    /*
+        The search_kbase_solr function that returns a solrresponse consisting of a string in the format of the specified 'result_format' in SearchSolrParams
+        The interface is exactly the same as that of search_solr, except the output content will be different. And this function is exposed to the narrative for users to search KBase Solr databases, while search_solr will be mainly serving RDM.
+    */
+    funcdef search_kbase_solr(SearchSolrParams params) returns (solrresponse output) authentication required;
 
     /*
         Arguments for the add_json_2solr function - send a JSON doc data to solr for indexing

@@ -1357,33 +1357,6 @@ sub search_kbase_solr
     my $ctx = $KBSolrUtil::KBSolrUtilServer::CallContext;
     my($output);
     #BEGIN search_kbase_solr
-    $params = $self->util_initialize_call($params,$ctx);
-    $params = $self->util_args($params,[],{
-        solr_core => "GenomeFeatures_ci",
-        search_param => {},
-        search_query => {q=>"*"},
-        result_format => "xml",
-        group_option => "",
-        skip_escape => {}
-    });  
-    my $solrCore = $params->{solr_core}; 
-    my $searchParam = $params->{search_param};
-    my $searchQuery = $params->{search_query};
-    my $resultFormat = $params->{result_format};
-    my $groupOption = $params->{group_option};
-    my $skipEscape = $params->{skip_escape};
-    
-    if (!$self->_ping()) {
-        die "\nError--Solr server not responding:\n" . $self->_error->{response};
-    }
-
-    my $queryString = $self->_buildQueryString($searchQuery, $searchParam, $groupOption, $resultFormat, $skipEscape);
-    print "Search query string:\n$queryString\n";
-    my $solrQuery = $self->{_SOLR_URL}."/".$solrCore."/select?".$queryString;
-    
-    my $solr_response = $self->_sendRequest("$solrQuery", "GET");
-    $output = {solr_search_result=>$solr_response->{response}};
-
     #END search_kbase_solr
     my @_bad_returns;
     (ref($output) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"output\" (value was \"$output\")");

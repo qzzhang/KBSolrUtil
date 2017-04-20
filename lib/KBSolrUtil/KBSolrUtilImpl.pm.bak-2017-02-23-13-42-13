@@ -3,9 +3,9 @@ use strict;
 use Bio::KBase::Exceptions;
 # Use Semantic Versioning (2.0.0-rc.1)
 # http://semver.org 
-our $VERSION = '0.0.2';
+our $VERSION = '0.0.1';
 our $GIT_URL = 'https://github.com/qzzhang/KBSolrUtil.git';
-our $GIT_COMMIT_HASH = '47b3f4b17612ddd1be381e9e25a2bd4912872507';
+our $GIT_COMMIT_HASH = 'd0036c7d07a4de8ee4025cfdafd9b56f521bdc4f';
 
 =head1 NAME
 
@@ -21,7 +21,6 @@ This module contains the utility methods and configuration details to access the
 #BEGIN_HEADER
 use Bio::KBase::AuthToken;
 use Workspace::WorkspaceClient;
-use Bio::KBase::HandleService;
 #use Bio::KBase::Workspace::Client;
 use Config::IniFiles;
 use Config::Simple;
@@ -31,9 +30,7 @@ use JSON;
 use Data::Dumper qw(Dumper);
 use LWP::UserAgent;
 use XML::Simple;
-use XML::LibXML;
 use Try::Tiny;
-use DateTime;
 
 #The first thing every function should do is call this function
 sub util_initialize_call {
@@ -47,14 +44,11 @@ sub util_initialize_call {
     my $cfg = Config::IniFiles->new(-file=>$config_file);
     $self->{data} = $cfg->val('KBSolrUtil','data');
     $self->{scratch} = $cfg->val('KBSolrUtil','scratch');
-    $self->{'workspace-url'} = $cfg->val('KBSolrUtil','workspace-url');
-    die "no workspace-url defined" unless $self->{'workspace-url'};
-    $self->{'shock-url'} = $cfg->val('KBSolrUtil','shock-url');
-    die "no shock-url defined" unless $self->{'shock-url'};
-    $self->{'handle-service-url'} = $cfg->val('KBSolrUtil','handle-service-url');
-    die "no handle-service-url defined" unless $self->{'handle-service-url'};
+    $self->{workspace_url} = $cfg->val('KBSolrUtil','workspace-url');
+    die "no workspace-url defined" unless $self->{workspace_url};
+
     $self->util_timestamp(DateTime->now()->datetime());
-    $self->{_wsclient} = new Workspace::WorkspaceClient($self->{'workspace-url'},token => $ctx->token());
+    $self->{_wsclient} = new Workspace::WorkspaceClient($self->{workspace_url},token => $ctx->token());
     return $params;
 }
 
@@ -133,33 +127,6 @@ sub util_timestamp {
 # and, if there is any space in the middle of the string, it replaces the spaces with '*'; for cases when no '*' at the ends of the value string, it adds
 # double quotes to enclose the whole value string (including spaces).
 #
-# parameters:                                                                                                  
-# $searchQuery is a hash which specifies how the documents will be searched, see the example below:
-# $searchQuery={
-#   parent_taxon_ref => '1779/116411/1',
-#   rank => 'species',
-#   scientific_lineage => 'cellular organisms; Bacteria; Proteobacteria; Alphaproteobacteria; Rhizobiales; Bradyrhizobiaceae; Bradyrhizobium',
-#   scientific_name => 'Bradyrhizobium sp. rp3',
-#   domain => 'Bacteria'
-#}
-# OR, simply:
-# $searchQuery= { q => "*" };
-#
-# $searchParams is a hash, see the example below:
-# $searchParams={
-#   fl => 'object_id,gene_name,genome_source',
-#   wt => 'json',
-#   rows => $count,
-#   sort => 'object_id asc',
-#   hl => 'false',
-#   start => $start,
-#   count => $count
-#}
-#
-# $resultFormat is a string indicating what format you want SOLR to return the search results, json, csv, xml, etc.  It overrides the value for 'wt' set in the $searchParams
-#
-# returns a string
-#
 sub _buildQueryString {
     my ($self, $searchQuery, $searchParams, $groupOption, $resultFormat, $skipEscape) = @_;
     $skipEscape = {} unless $skipEscape;
@@ -174,17 +141,14 @@ sub _buildQueryString {
     }
     
     # Build the display parameter part                                             
-    my $paramFields = "";
-    if( $resultFormat ne "xml" ) {
-        $paramFields .= "wt=". URI::Escape::uri_escape($resultFormat) . "&";
-    }    
+    my $paramFields = "";                                                                                                                                                                                            
     foreach my $key (keys %$searchParams) {
         if( $key eq "wt" ) {
-            #do nothing, wt is set according to the value of $resultFormat and default to 'xml'
+           $paramFields .= "$key=". URI::Escape::uri_escape($resultFormat}) . "&";
         }
         else {
            $paramFields .= "$key=". URI::Escape::uri_escape($searchParams->{$key}) . "&";
-        }
+       }
     }
     
     # Build the solr query part
@@ -195,9 +159,8 @@ sub _buildQueryString {
     } else {
         foreach my $key (keys %$searchQuery) {
             $val = $searchQuery->{$key};
-            if( $val =~ m/^\*.*|^\*.*\*$|.*\*$|.*\*.*/ ) {#when there is '*' at the ends or middle of the search value
+            if( $val =~ m/^\*.*|^\*.*\*$|.*\*$/ ) {#when there is '*' at the ends of the search value
                 $val =~ s/\s+/\*/g;#replace the spaces with '*' otherwise without the double quote, spaces will be problematic
-                $val =~ s/\.//g;#remove the periods because SOLR does not handle periods with '*' well
                 if (defined $skipEscape->{$key}) {
                    $qStr .= "+$key:" . $val ." $DEFAULT_FIELD_CONNECTOR ";
                 } else {
@@ -215,7 +178,7 @@ sub _buildQueryString {
         # Remove last occurance of ' AND '
         $qStr =~ s/ AND $//g;
     }
-    my $solrGroup = $groupOption ? "&group=true&group.ngroups=true&group.field=$groupOption" : "";
+    my $solrGroup = $groupOption ? "&group=true&group.field=$groupOption" : "";
     my $retStr = $paramFields . $qStr . $solrGroup;
     #print "Query string:\n$retStr\n";
     return $retStr;
@@ -352,7 +315,7 @@ sub _parseResponse
 }
 
 #
-# internal method: _toJSON, converts a given array of references (Perl scalars) to an array of JSON documents
+# internal method: _toJSON, converts a given array of references to an array of JSON documents
 # input format:
 # A list/an array that consists references to an object maps, 
 =for example:
@@ -451,9 +414,10 @@ sub _parseResponse
 #
 sub _toJSON
 {
-    my ($self, $inputData) = @_;
+    my ($self, $params) = @_;
+    my $json = new JSON;
     my $json_docs = [];
-    $json_docs = JSON->new->encode($inputData); 
+    $json_docs = $json->encode($params);
     return $json_docs; 
 }
 
@@ -463,7 +427,7 @@ sub _toJSON
 # Depending on the flag AUTOCOMMIT the documents will be indexed immediatly or on commit is issued.
 # parameters:   
 #     $inputObjs: This parameter specifies list of document fields and values.
-#     $jsonString: true (1) if $inputObjs is passed as a json string in quotes; default to false (0).
+#     $jsonString: truei (1) if $inputObjs is passed as a json string in quotes; default to false (0).
 # return
 #    1 for successful posting of the xml document
 #    0 for any failure
@@ -472,25 +436,23 @@ sub _toJSON
 sub _addJSON2Solr
 {
     my ($self, $solrCore, $inputObjs, $jsonString) = @_;
-#=begin    
+    
     if (!$self->_ping()) {
         die "\nError--Solr server not responding:\n" . $self->_error->{response};
     }
-#=cut
 
     $jsonString = 0 unless $jsonString;
+
     my $docs;
     if ($jsonString == 1) {
         $docs = $inputObjs;
     }
     else {
         $docs = $self->_toJSON($inputObjs);
-        #print "\nConverted Perl scalars to json:\n " . Dumper($docs);
     }
     
     my $commit = $self->{_AUTOCOMMIT} ? 'true' : 'false';
-    my $url = "$self->{_SOLR_URL}/$solrCore/update/json?commit=false";# . $commit; 
-#=begin
+    my $url = "$self->{_SOLR_URL}/$solrCore/update/json?commit=true";# . $commit; 
     my $response = $self->_sendRequest($url, 'POST', 'binary', $self->{_CT_JSON}, $docs);
 
     if ($self->_parseResponse($response) == 0) {
@@ -500,20 +462,13 @@ sub _addJSON2Solr
             print "\n" . Dumper($response);
             return 0;
     }
-#=cut
-    if (!$self->_commit($solrCore)) {
-        die $self->_error->{response};
-        return 0;
-    }
-    else {
-        return 1;
-    }
+    return 1;
 }
 
 #
 # method name: _addXML2Solr
 # Internal method: to add XML documents to solr for indexing.
-# First it will convert the raw datastructure to required ds then it will convert
+# It sends a xml http request.  First it will convert the raw datastructure to required ds then it will convert
 # this ds to xml. This xml will be posted to Apache solr for indexing.
 # Depending on the flag AUTOCOMMIT the documents will be indexed immediatly or on commit is issued.
 # parameters:   
@@ -551,7 +506,8 @@ sub _addXML2Solr
 #
 # method name: _toXML
 # Internal Method
-# This function will convert the datastructe to an XML document for XML Formatted Solr indexing.
+# This function will convert the datastructe to XML document
+# For XML Formatted Index Updates
 #
 # The XML schema recognized by the update handler for adding documents is very straightforward:
 # The <add> element introduces one or more documents to be added.
@@ -767,8 +723,6 @@ sub _rollback
 #   scientific_name => 'Bradyrhizobium sp. rp3',
 #   domain => 'Bacteria'
 #}
-# $solrCore is a string that represents the name of the SOLR core
-#
 # returns :
 #    1 for yes (document match found) 
 #    0 for any failure
@@ -784,8 +738,8 @@ sub _exists
     my $queryString = $self->_buildQueryString($searchCriteria);
     my $url = $self->{_SOLR_URL}."/$solrCore/select?";
     $url = $url. $queryString;
-    #print "Exists checking query:" . $queryString;
     my $response = $self->_sendRequest($url, 'GET');
+
     my $status = $self->_parseResponse($response);
     if ($status == 1) {
         my $xs = new XML::Simple();
@@ -793,7 +747,7 @@ sub _exists
         eval {
             $xmlRef = $xs->XMLin($response->{response});
         };
-        #print "\n$url result:\n" . Dumper($xmlRef->{result}) . "\n";
+        print "\n$url result:\n" . Dumper($xmlRef->{result}) . "\n";
         if ($xmlRef->{lst}->{'int'}->{status}->{content} eq 0){
             if ($xmlRef->{result}->{numFound} gt 0) {
             return 1;
@@ -899,7 +853,7 @@ sub new
 $params is a KBSolrUtil.IndexInSolrParams
 $output is an int
 IndexInSolrParams is a reference to a hash where the following keys are defined:
-	solr_core has a value which is a string
+	search_core has a value which is a string
 	doc_data has a value which is a reference to a list where each element is a KBSolrUtil.docdata
 docdata is a reference to a hash where the key is a string and the value is a string
 
@@ -912,7 +866,7 @@ docdata is a reference to a hash where the key is a string and the value is a st
 $params is a KBSolrUtil.IndexInSolrParams
 $output is an int
 IndexInSolrParams is a reference to a hash where the following keys are defined:
-	solr_core has a value which is a string
+	search_core has a value which is a string
 	doc_data has a value which is a reference to a list where each element is a KBSolrUtil.docdata
 docdata is a reference to a hash where the key is a string and the value is a string
 
@@ -947,7 +901,7 @@ sub index_in_solr
     #BEGIN index_in_solr
     $params = $self->util_initialize_call($params,$ctx);
     $params = $self->util_args($params,[],{
-        solr_core => "",
+        solr_core => "GenomeFeatures_ci",
         doc_data => []
     });  
  
@@ -975,190 +929,6 @@ sub index_in_solr
 	my $msg = "Invalid returns passed to index_in_solr:\n" . join("", map { "\t$_\n" } @_bad_returns);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
 							       method_name => 'index_in_solr');
-    }
-    return($output);
-}
-
-
-
-
-=head2 exists_in_solr
-
-  $output = $obj->exists_in_solr($params)
-
-=over 4
-
-=item Parameter and return types
-
-=begin html
-
-<pre>
-$params is a KBSolrUtil.ExistsInputParams
-$output is an int
-ExistsInputParams is a reference to a hash where the following keys are defined:
-	search_core has a value which is a string
-	search_query has a value which is a KBSolrUtil.searchdata
-searchdata is a reference to a hash where the key is a string and the value is a string
-
-</pre>
-
-=end html
-
-=begin text
-
-$params is a KBSolrUtil.ExistsInputParams
-$output is an int
-ExistsInputParams is a reference to a hash where the following keys are defined:
-	search_core has a value which is a string
-	search_query has a value which is a KBSolrUtil.searchdata
-searchdata is a reference to a hash where the key is a string and the value is a string
-
-
-=end text
-
-
-
-=item Description
-
-The exists_in_solr function that returns 0 or 1
-
-=back
-
-=cut
-
-sub exists_in_solr
-{
-    my $self = shift;
-    my($params) = @_;
-
-    my @_bad_arguments;
-    (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument \"params\" (value was \"$params\")");
-    if (@_bad_arguments) {
-	my $msg = "Invalid arguments passed to exists_in_solr:\n" . join("", map { "\t$_\n" } @_bad_arguments);
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-							       method_name => 'exists_in_solr');
-    }
-
-    my $ctx = $KBSolrUtil::KBSolrUtilServer::CallContext;
-    my($output);
-    #BEGIN exists_in_solr
-    $params = $self->util_initialize_call($params,$ctx);
-    $params = $self->util_args($params,[],{
-        search_core => "GenomeFeatures_ci",
-        search_query => {q=>"*"},
-    });  
-    my $solrCore = $params->{search_core}; 
-    my $searchQuery = $params->{search_query};
-    
-    $output = $self->_exists($solrCore, $searchQuery);
-    
-    #END exists_in_solr
-    my @_bad_returns;
-    (!ref($output)) or push(@_bad_returns, "Invalid type for return variable \"output\" (value was \"$output\")");
-    if (@_bad_returns) {
-	my $msg = "Invalid returns passed to exists_in_solr:\n" . join("", map { "\t$_\n" } @_bad_returns);
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-							       method_name => 'exists_in_solr');
-    }
-    return($output);
-}
-
-
-
-
-=head2 get_total_count
-
-  $output = $obj->get_total_count($params)
-
-=over 4
-
-=item Parameter and return types
-
-=begin html
-
-<pre>
-$params is a KBSolrUtil.TotalCountParams
-$output is an int
-TotalCountParams is a reference to a hash where the following keys are defined:
-	search_core has a value which is a string
-	search_query has a value which is a KBSolrUtil.searchdata
-searchdata is a reference to a hash where the key is a string and the value is a string
-
-</pre>
-
-=end html
-
-=begin text
-
-$params is a KBSolrUtil.TotalCountParams
-$output is an int
-TotalCountParams is a reference to a hash where the following keys are defined:
-	search_core has a value which is a string
-	search_query has a value which is a KBSolrUtil.searchdata
-searchdata is a reference to a hash where the key is a string and the value is a string
-
-
-=end text
-
-
-
-=item Description
-
-The get_total_count function that returns a positive integer (including 0) or -1
-
-=back
-
-=cut
-
-sub get_total_count
-{
-    my $self = shift;
-    my($params) = @_;
-
-    my @_bad_arguments;
-    (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument \"params\" (value was \"$params\")");
-    if (@_bad_arguments) {
-	my $msg = "Invalid arguments passed to get_total_count:\n" . join("", map { "\t$_\n" } @_bad_arguments);
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-							       method_name => 'get_total_count');
-    }
-
-    my $ctx = $KBSolrUtil::KBSolrUtilServer::CallContext;
-    my($output);
-    #BEGIN get_total_count
-    $params = $self->util_initialize_call($params,$ctx);
-    $params = $self->util_args($params,[],{
-        search_core => "Genomes_ci",
-        search_query => {q=>"*"}
-    });  
-    my $solrCore = $params->{search_core};
-    my $query = $params->{search_query};
-    
-    my $solrout;
-    my $output;
-    eval {
-        $solrout = $self->search_solr({
-                solr_core => $solrCore, 
-                search_param => {fl=>"*",wt=>"json",rows=>0}, 
-                search_query => $query, 
-                result_format => "json", 
-                group_option => "",
-                skip_escape => {}
-            });
-    };
-    if ($@) {
-        print "ERROR:".$@;
-        $output = -1;
-    } else {
-        $output = $solrout->{response}->{response}->{numFound};
-    }
-    #END get_total_count
-    my @_bad_returns;
-    (!ref($output)) or push(@_bad_returns, "Invalid type for return variable \"output\" (value was \"$output\")");
-    if (@_bad_returns) {
-	my $msg = "Invalid returns passed to get_total_count:\n" . join("", map { "\t$_\n" } @_bad_returns);
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-							       method_name => 'get_total_count');
     }
     return($output);
 }
@@ -1212,7 +982,7 @@ solrresponse is a reference to a hash where the key is a string and the value is
 
 =item Description
 
-The search_solr function that returns a solrresponse consisting of a string in the format of the Perl structure (hash)
+The search_solr function that returns a solrresponse consisting of a string in the format of the specified 'result_format' in SearchSolrParams
 
 =back
 
@@ -1243,29 +1013,30 @@ sub search_solr
         group_option => "",
         skip_escape => {}
     });  
-    my $solrCore = $params->{solr_core}; 
-    my $searchParam = $params->{search_param};
-    my $searchQuery = $params->{search_query};
-    my $resultFormat = $params->{result_format};
-    my $groupOption = $params->{group_option};
-    my $skipEscape = $params->{skip_escape};
+    my $solrCore = $params->{ solr_core }; 
+    my $searchParam = $params->{ search_param };
+    my $searchQuery = $params->{ search_query };
+    my $resultFormat = $params->{ result_format };
+    my $groupOption = $params->{ group_option };
+    my $skipEscape = $params->{ skip_escape };
     
     if (!$self->_ping()) {
         die "\nError--Solr server not responding:\n" . $self->_error->{response};
     }
-
+    
     my $queryString = $self->_buildQueryString($searchQuery, $searchParam, $groupOption, $resultFormat, $skipEscape);
-    print "Search query string:\n$queryString\n";
     my $solrQuery = $self->{_SOLR_URL}."/".$solrCore."/select?".$queryString;
+    #print "Search string:\n$solrQuery\n";
     
     my $solr_response = $self->_sendRequest("$solrQuery", "GET");
+    #print "\nRaw response: \n" . $solr_response->{response} . "\n";
+    
     my $responseCode = $self->_parseResponse($solr_response, $resultFormat);
-        
-    if ($responseCode) {
-        if ($resultFormat eq "json") {
-            my $out = JSON::from_json($solr_response->{response});
-            $solr_response->{response}= $out;
-        }
+        if ($responseCode) {
+            if ($resultFormat eq "json") {
+                my $out = JSON::from_json($solr_response->{response});
+                $solr_response->{response}= $out;
+            }
     }
     if($groupOption){
         my @solr_records = @{$solr_response->{response}->{grouped}->{$groupOption}->{groups}};
@@ -1281,199 +1052,6 @@ sub search_solr
 	my $msg = "Invalid returns passed to search_solr:\n" . join("", map { "\t$_\n" } @_bad_returns);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
 							       method_name => 'search_solr');
-    }
-    return($output);
-}
-
-
-
-
-=head2 search_kbase_solr
-
-  $output = $obj->search_kbase_solr($params)
-
-=over 4
-
-=item Parameter and return types
-
-=begin html
-
-<pre>
-$params is a KBSolrUtil.SearchSolrParams
-$output is a KBSolrUtil.solrresponse
-SearchSolrParams is a reference to a hash where the following keys are defined:
-	search_core has a value which is a string
-	search_param has a value which is a KBSolrUtil.searchdata
-	search_query has a value which is a KBSolrUtil.searchdata
-	result_format has a value which is a string
-	group_option has a value which is a string
-searchdata is a reference to a hash where the key is a string and the value is a string
-solrresponse is a reference to a hash where the key is a string and the value is a string
-
-</pre>
-
-=end html
-
-=begin text
-
-$params is a KBSolrUtil.SearchSolrParams
-$output is a KBSolrUtil.solrresponse
-SearchSolrParams is a reference to a hash where the following keys are defined:
-	search_core has a value which is a string
-	search_param has a value which is a KBSolrUtil.searchdata
-	search_query has a value which is a KBSolrUtil.searchdata
-	result_format has a value which is a string
-	group_option has a value which is a string
-searchdata is a reference to a hash where the key is a string and the value is a string
-solrresponse is a reference to a hash where the key is a string and the value is a string
-
-
-=end text
-
-
-
-=item Description
-
-The search_kbase_solr function that returns a solrresponse consisting of a string in the format of the specified 'result_format' in SearchSolrParams
-The interface is exactly the same as that of search_solr, except the output content will be different. And this function is exposed to the narrative for users to search KBase Solr databases, while search_solr will be mainly serving RDM.
-
-=back
-
-=cut
-
-sub search_kbase_solr
-{
-    my $self = shift;
-    my($params) = @_;
-
-    my @_bad_arguments;
-    (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument \"params\" (value was \"$params\")");
-    if (@_bad_arguments) {
-	my $msg = "Invalid arguments passed to search_kbase_solr:\n" . join("", map { "\t$_\n" } @_bad_arguments);
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-							       method_name => 'search_kbase_solr');
-    }
-
-    my $ctx = $KBSolrUtil::KBSolrUtilServer::CallContext;
-    my($output);
-    #BEGIN search_kbase_solr
-    $params = $self->util_initialize_call($params,$ctx);
-    $params = $self->util_args($params,[],{
-        solr_core => "GenomeFeatures_ci",
-        search_param => {},
-        search_query => {q=>"*"},
-        result_format => "xml",
-        group_option => "",
-        skip_escape => {}
-    });  
-    my $solrCore = $params->{solr_core}; 
-    my $searchParam = $params->{search_param};
-    my $searchQuery = $params->{search_query};
-    my $resultFormat = $params->{result_format};
-    my $groupOption = $params->{group_option};
-    my $skipEscape = $params->{skip_escape};
-    
-    if (!$self->_ping()) {
-        die "\nError--Solr server not responding:\n" . $self->_error->{response};
-    }
-
-    my $queryString = $self->_buildQueryString($searchQuery, $searchParam, $groupOption, $resultFormat, $skipEscape);
-    print "Search query string:\n$queryString\n";
-    my $solrQuery = $self->{_SOLR_URL}."/".$solrCore."/select?".$queryString;
-    
-    my $solr_response = $self->_sendRequest("$solrQuery", "GET");
-    $output = {solr_search_result=>$solr_response->{response}};
-
-    #END search_kbase_solr
-    my @_bad_returns;
-    (ref($output) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"output\" (value was \"$output\")");
-    if (@_bad_returns) {
-	my $msg = "Invalid returns passed to search_kbase_solr:\n" . join("", map { "\t$_\n" } @_bad_returns);
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-							       method_name => 'search_kbase_solr');
-    }
-    return($output);
-}
-
-
-
-
-=head2 add_json_2solr
-
-  $output = $obj->add_json_2solr($params)
-
-=over 4
-
-=item Parameter and return types
-
-=begin html
-
-<pre>
-$params is a KBSolrUtil.IndexJsonParams
-$output is an int
-IndexJsonParams is a reference to a hash where the following keys are defined:
-	solr_core has a value which is a string
-	json_data has a value which is a string
-
-</pre>
-
-=end html
-
-=begin text
-
-$params is a KBSolrUtil.IndexJsonParams
-$output is an int
-IndexJsonParams is a reference to a hash where the following keys are defined:
-	solr_core has a value which is a string
-	json_data has a value which is a string
-
-
-=end text
-
-
-
-=item Description
-
-The add_json_2solr function that returns 1 if succeeded otherwise 0
-
-=back
-
-=cut
-
-sub add_json_2solr
-{
-    my $self = shift;
-    my($params) = @_;
-
-    my @_bad_arguments;
-    (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument \"params\" (value was \"$params\")");
-    if (@_bad_arguments) {
-	my $msg = "Invalid arguments passed to add_json_2solr:\n" . join("", map { "\t$_\n" } @_bad_arguments);
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-							       method_name => 'add_json_2solr');
-    }
-
-    my $ctx = $KBSolrUtil::KBSolrUtilServer::CallContext;
-    my($output);
-    #BEGIN add_json_2solr
-    $params = $self->util_initialize_call($params,$ctx);
-    $params = $self->util_args($params,[],{
-        solr_core => "Genomes_ci",
-        json_data => ""
-    });  
-    my $solrCore = $params->{solr_core};
-    my $docs = $params->{json_data}; 
-    my $output;
-    $output = $self->_addJSON2Solr($solrCore, $docs, 1);    
-
-
-    #END add_json_2solr
-    my @_bad_returns;
-    (!ref($output)) or push(@_bad_returns, "Invalid type for return variable \"output\" (value was \"$output\")");
-    if (@_bad_returns) {
-	my $msg = "Invalid returns passed to add_json_2solr:\n" . join("", map { "\t$_\n" } @_bad_returns);
-	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-							       method_name => 'add_json_2solr');
     }
     return($output);
 }
@@ -1655,7 +1233,7 @@ a reference to a hash where the key is a string and the value is a string
 
 Arguments for the index_in_solr function - send doc data to solr for indexing
 
-string solr_core - the name of the solr core to index to
+string search_core - the name of the solr core to index to
 list<docdata> doc_data - the doc to be indexed, a list of hashes
 
 
@@ -1665,7 +1243,7 @@ list<docdata> doc_data - the doc to be indexed, a list of hashes
 
 <pre>
 a reference to a hash where the following keys are defined:
-solr_core has a value which is a string
+search_core has a value which is a string
 doc_data has a value which is a reference to a list where each element is a KBSolrUtil.docdata
 
 </pre>
@@ -1675,106 +1253,8 @@ doc_data has a value which is a reference to a list where each element is a KBSo
 =begin text
 
 a reference to a hash where the following keys are defined:
-solr_core has a value which is a string
+search_core has a value which is a string
 doc_data has a value which is a reference to a list where each element is a KBSolrUtil.docdata
-
-
-=end text
-
-=back
-
-
-
-=head2 ExistsInputParams
-
-=over 4
-
-
-
-=item Description
-
-Arguments for the exists_in_solr function - search solr according to the parameters passed and return 1 if found at least one doc 0 if nothing found. A shorter version of search_solr.
-
-string search_core - the name of the solr core to be searched
-searchdata search_query - arbitrary user-supplied key-value pairs specifying the fields to be searched and their values to be matched, a hash which specifies how the documents will be searched, see the example below:
-        search_query={
-                parent_taxon_ref => '1779/116411/1',
-                rank => 'species',
-                scientific_lineage => 'cellular organisms; Bacteria; Proteobacteria; Alphaproteobacteria; Rhizobiales; Bradyrhizobiaceae; Bradyrhizobium',
-                scientific_name => 'Bradyrhizobium sp.*',
-                domain => 'Bacteria'
-        }
-OR, simply:
-        search_query= { q => "*" };
-
-
-=item Definition
-
-=begin html
-
-<pre>
-a reference to a hash where the following keys are defined:
-search_core has a value which is a string
-search_query has a value which is a KBSolrUtil.searchdata
-
-</pre>
-
-=end html
-
-=begin text
-
-a reference to a hash where the following keys are defined:
-search_core has a value which is a string
-search_query has a value which is a KBSolrUtil.searchdata
-
-
-=end text
-
-=back
-
-
-
-=head2 TotalCountParams
-
-=over 4
-
-
-
-=item Description
-
-Arguments for the get_total_count function - search solr according to the parameters passed and return the count of docs found, or -1 if error.
-
-string search_core - the name of the solr core to be searched
-searchdata search_query - arbitrary user-supplied key-value pairs specifying the fields to be searched and their values to be matched, a hash which specifies how the documents will be searched, see the example below:
-        search_query={
-                parent_taxon_ref => '1779/116411/1',
-                rank => 'species',
-                scientific_lineage => 'cellular organisms; Bacteria; Proteobacteria; Alphaproteobacteria; Rhizobiales; Bradyrhizobiaceae; Bradyrhizobium',
-                scientific_name => 'Bradyrhizobium sp.*',
-                domain => 'Bacteria'
-        }
-OR, simply:
-        search_query= { q => "*" };
-
-
-=item Definition
-
-=begin html
-
-<pre>
-a reference to a hash where the following keys are defined:
-search_core has a value which is a string
-search_query has a value which is a KBSolrUtil.searchdata
-
-</pre>
-
-=end html
-
-=begin text
-
-a reference to a hash where the following keys are defined:
-search_core has a value which is a string
-search_query has a value which is a KBSolrUtil.searchdata
 
 
 =end text
@@ -1794,26 +1274,25 @@ search_query has a value which is a KBSolrUtil.searchdata
 Arguments for the search_solr function - search solr according to the parameters passed and return a string
 
 string search_core - the name of the solr core to be searched
-searchdata search_param - arbitrary user-supplied key-value pairs for controlling the presentation of the query response, 
-                        a hash, see the example below:
+searchdata search_param - arbitrary user-supplied key-value pairs defining how the search should be conducted, 
+        a hash, see the example below:
         search_param={
                 fl => 'object_id,gene_name,genome_source',
                 wt => 'json',
                 rows => 20,
                 sort => 'object_id asc',
                 hl => 'false',
-                start => 100
+                start => 0,
+                count => 100
         }
-OR, default to SOLR default settings, i
-        search_param={{fl=>'*',wt=>'xml',rows=>10,sort=>'',hl=>'false',start=>0}
 
-searchdata search_query - arbitrary user-supplied key-value pairs specifying the fields to be searched and their values 
+searchdata search_query - arbitrary user-supplied key-value pairs defining the fields to be searched and their values 
                         to be matched, a hash which specifies how the documents will be searched, see the example below:
         search_query={
                 parent_taxon_ref => '1779/116411/1',
                 rank => 'species',
                 scientific_lineage => 'cellular organisms; Bacteria; Proteobacteria; Alphaproteobacteria; Rhizobiales; Bradyrhizobiaceae; Bradyrhizobium',
-                scientific_name => 'Bradyrhizobium sp.*',
+                scientific_name => 'Bradyrhizobium sp. rp3',
                 domain => 'Bacteria'
         }
 OR, simply:
@@ -1847,91 +1326,6 @@ search_param has a value which is a KBSolrUtil.searchdata
 search_query has a value which is a KBSolrUtil.searchdata
 result_format has a value which is a string
 group_option has a value which is a string
-
-
-=end text
-
-=back
-
-
-
-=head2 IndexJsonParams
-
-=over 4
-
-
-
-=item Description
-
-Arguments for the add_json_2solr function - send a JSON doc data to solr for indexing
-
-string solr_core - the name of the solr core to index to
-string json_data - the doc to be indexed, a JSON string 
-=for example:
-     $json_data = '[
-     {
-"taxonomy_id":1297193,
-"domain":"Eukaryota",
-"genetic_code":1,
-"embl_code":"CS",
-"division_id":1,
-"inherited_div_flag":1,
-"inherited_MGC_flag":1,
-"parent_taxon_ref":"12570/1217907/1",
-"scientific_name":"Camponotus sp. MAS010",
-"mitochondrial_genetic_code":5,
-"hidden_subtree_flag":0,
-"scientific_lineage":"cellular organisms; Eukaryota; Opisthokonta; Metazoa; Eumetazoa; Bilateria; Protostomia; Ecdysozoa; Panarthropoda; Arthropoda; Mandibulata; Pancrustacea; Hexapoda; Insecta; Dicondylia; Pterygota; Neoptera; Endopterygota; Hymenoptera; Apocrita; Aculeata; Vespoidea; Formicidae; Formicinae; Camponotini; Camponotus",
-"rank":"species",
-"ws_ref":"12570/1253105/1",
-"kingdom":"Metazoa",
-"GenBank_hidden_flag":1,
-"inherited_GC_flag":1,"
-"deleted":0
-      },
-      {
-"inherited_MGC_flag":1,
-"inherited_div_flag":1,
-"parent_taxon_ref":"12570/1217907/1",
-"genetic_code":1,
-"division_id":1,
-"embl_code":"CS",
-"domain":"Eukaryota",
-"taxonomy_id":1297190,
-"kingdom":"Metazoa",
-"GenBank_hidden_flag":1,
-"inherited_GC_flag":1,
-"ws_ref":"12570/1253106/1",
-"scientific_lineage":"cellular organisms; Eukaryota; Opisthokonta; Metazoa; Eumetazoa; Bilateria; Protostomia; Ecdysozoa; Panarthropoda; Arthropoda; Mandibulata; Pancrustacea; Hexapoda; Insecta; Dicondylia; Pterygota; Neoptera; Endopterygota; Hymenoptera; Apocrita; Aculeata; Vespoidea; Formicidae; Formicinae; Camponotini; Camponotus",
-"rank":"species",
-"scientific_name":"Camponotus sp. MAS003",
-"hidden_subtree_flag":0,
-"mitochondrial_genetic_code":5,
-"deleted":0
-      },
-...
-  ]';
-=cut end of example
-
-
-=item Definition
-
-=begin html
-
-<pre>
-a reference to a hash where the following keys are defined:
-solr_core has a value which is a string
-json_data has a value which is a string
-
-</pre>
-
-=end html
-
-=begin text
-
-a reference to a hash where the following keys are defined:
-solr_core has a value which is a string
-json_data has a value which is a string
 
 
 =end text

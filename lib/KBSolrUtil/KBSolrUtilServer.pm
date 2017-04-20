@@ -29,13 +29,21 @@ our $CallContext;
 
 our %return_counts = (
         'index_in_solr' => 1,
+        'exists_in_solr' => 1,
+        'get_total_count' => 1,
         'search_solr' => 1,
+        'search_kbase_solr' => 1,
+        'add_json_2solr' => 1,
         'status' => 1,
 );
 
 our %method_authentication = (
         'index_in_solr' => 'required',
+        'exists_in_solr' => 'required',
+        'get_total_count' => 'required',
         'search_solr' => 'required',
+        'search_kbase_solr' => 'required',
+        'add_json_2solr' => 'required',
 );
 
 sub _build_valid_methods
@@ -43,7 +51,11 @@ sub _build_valid_methods
     my($self) = @_;
     my $methods = {
         'index_in_solr' => 1,
+        'exists_in_solr' => 1,
+        'get_total_count' => 1,
         'search_solr' => 1,
+        'search_kbase_solr' => 1,
+        'add_json_2solr' => 1,
         'status' => 1,
     };
     return $methods;
@@ -236,7 +248,14 @@ sub call_method {
 	    $self->exception('PerlError', "Authentication required for KBSolrUtil but no authentication header was passed");
 	}
 
-	my $auth_token = Bio::KBase::AuthToken->new(token => $token, ignore_authrc => 1);
+	my $auth_token;
+        if ($self->config->{'auth-service-url'})
+        {
+            $auth_token = Bio::KBase::AuthToken->new(token => $token, ignore_authrc => 1, auth_svc=>$self->config->{'auth-service-url'});
+        } else {
+            $auth_token = Bio::KBase::AuthToken->new(token => $token, ignore_authrc => 1);
+        }
+
 	my $valid = $auth_token->validate();
 	# Only throw an exception if authentication was required and it fails
 	if ($method_auth eq 'required' && !$valid)

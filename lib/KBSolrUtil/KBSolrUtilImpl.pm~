@@ -1382,7 +1382,7 @@ sub search_kbase_solr
     my $solrQuery = $self->{_SOLR_URL}."/".$solrCore."/select?".$queryString;
     
     my $solr_response = $self->_sendRequest("$solrQuery", "GET");
-    $output = {solr_search_result=>$solr_response->{response}};
+    $output = {solr_response=>$solr_response->{response}};
 
     #END search_kbase_solr
     my @_bad_returns;
