@@ -136,6 +136,7 @@
                   "id": "csv",
                   "ui_name": "csv"
                 }
+              ]
             }               
         }
     ],
@@ -164,10 +165,6 @@
                 {
                     "input_parameter": "result_format",
                     "target_property": "result_format"
-                },
-                {
-                    "narrative_system_variable": "workspace",
-                    "target_property": "workspace"
                 }
             ],
             "output_mapping": [
