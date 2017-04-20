@@ -15,7 +15,7 @@
             "optional": false,
             "advanced": false,
             "allow_multiple": false,
-            "default_values": [ "" ],
+            "default_values": [ "Genomes_ci" ],
             "field_type": "dropdown",
             "dropdown_options":{
                 "options": [
@@ -114,7 +114,7 @@
             "optional": true,
             "advanced": false,
             "allow_multiple": false,
-            "default_values": "xml",
+            "default_values": ["xml"],
             "field_type": "dropdown",
             "dropdown_options":{
                 "options": [

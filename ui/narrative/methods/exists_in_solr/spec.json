@@ -11,19 +11,31 @@
     },
     "parameters": [ 
         {
-            "id": "search_core",
+           "id": "search_core",
             "optional": false,
             "advanced": false,
             "allow_multiple": false,
-            "default_values": [ "" ],
+            "default_values": [ "Genomes_ci" ],
             "field_type": "dropdown",
             "dropdown_options":{
                 "options": [
                 {
-                  "value": "taxonomy",
-                  "display": "taxonomy",
-                  "id": "taxonomy",
-                  "ui_name": "taxonomy"
+                  "value": "taxonomy in CI",
+                  "display": "taxonomy_ci",
+                  "id": "taxonomy_ci",
+                  "ui_name": "taxonomy_ci"
+                },
+                {
+                  "value": "taxonomy in production",
+                  "display": "taxonomy_prod",
+                  "id": "taxonomy_prod",
+                  "ui_name": "taxonomy_prod"
+                },
+                {
+                  "value": "GenomeFeatures_ci",
+                  "display": "Genome Features in CI",
+                  "id": "GenomeFeatures_ci",
+                  "ui_name": "GenomeFeatures_ci"
                 },
                 {
                   "value": "Genomes_ci",
@@ -38,7 +50,19 @@
                   "ui_name": "Genomes_prod"
                 },
                 {
-                  "value": "Reactions",
+                  "value": "Biochemical Compounds",
+                  "display": "Compounds",
+                  "id": "Compounds",
+                  "ui_name": "Compounds"
+                },
+                {
+                  "value": "Subsystems",
+                  "display": "Subsystems",
+                  "id": "Subsystems",
+                  "ui_name": "Subsystems"
+                },
+                {
+                  "value": "Biochemical Reactions",
                   "display": "Reactions",
                   "id": "Reactions",
                   "ui_name": "Reactions"
