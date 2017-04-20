@@ -152,12 +152,12 @@
                 },
                 {
                     "input_parameter": "search_query",
-                    "target_type_transform": "list<ref>",
+                    "target_type_transform": "ref",
                     "target_property": "search_query"
                 },
                 {
                     "input_parameter": "search_param",
-                    "target_type_transform": "list<ref>",
+                    "target_type_transform": "ref",
                     "target_property": "search_param"
                 },
                 {
