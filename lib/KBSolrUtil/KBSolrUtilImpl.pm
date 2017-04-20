@@ -177,7 +177,8 @@ sub _buildQueryString {
     my $paramFields = "";
     if( $resultFormat ne "xml" ) {
         $paramFields .= "wt=". URI::Escape::uri_escape($resultFormat) . "&";
-    }    
+    }
+print Dumper($searchParams);    
     foreach my $key (keys %$searchParams) {
         if( $key eq "wt" ) {
             #do nothing, wt is set according to the value of $resultFormat and default to 'xml'
