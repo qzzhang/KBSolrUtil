@@ -39,7 +39,7 @@ parameters :
             Specifies the criteria in a list of key=>value pairs
     search_param :
         ui-name : |
-            Response Control
+            Result Display
         short-hint : |
             For controlling the presentation of the query response
     result_format :

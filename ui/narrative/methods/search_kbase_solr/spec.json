@@ -101,7 +101,7 @@
         {
             "id": "group_option",
             "optional": true,
-            "advanced": false,
+            "advanced": true,
             "allow_multiple": false,
             "default_values": "",
             "field_type": "text",
@@ -115,10 +115,28 @@
             "advanced": false,
             "allow_multiple": false,
             "default_values": "xml",
-            "field_type": "text",
-            "text_options": {
-                "validate_as": "text"
-            }
+            "field_type": "dropdown",
+            "dropdown_options":{
+                "options": [
+                {
+                  "value": "xml",
+                  "display": "xml",
+                  "id": "xml",
+                  "ui_name": "xml"
+                },
+                {
+                  "value": "json",
+                  "display": "json",
+                  "id": "json",
+                  "ui_name": "json"
+                },
+                {
+                  "value": "csv",
+                  "display": "csv",
+                  "id": "csv",
+                  "ui_name": "csv"
+                }
+            }               
         }
     ],
     "behavior": {
