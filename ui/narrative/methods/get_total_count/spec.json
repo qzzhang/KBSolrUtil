@@ -50,6 +50,24 @@
                   "ui_name": "Genomes_prod"
                 },
                 {
+                  "value": "media",
+                  "display": "media",
+                  "id": "media",
+                  "ui_name": "media"
+                },
+                {
+                  "value": "models",
+                  "display": "Models in KBase",
+                  "id": "models",
+                  "ui_name": "models"
+                },
+                {
+                  "value": "metagenomes",
+                  "display": "metagenomes",
+                  "id": "metagenomes",
+                  "ui_name": "metagenomes"
+                },
+                {
                   "display": "Biochemical Compounds",
                   "value": "Compounds",
                   "id": "Compounds",
