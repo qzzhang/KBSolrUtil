@@ -37,7 +37,7 @@ parameters :
             Data to Index
         short-hint : |
             The data to be indexed in Solr, in the form of an array of hashes
-        long-hing : |
+        long-hint : |
             The data to be indexed in Solr, in the form of an array of hashes.
             For example:'[{attr1=>[value1, value2],attr2=>[value3, value4]},{attr3=>[value5, value6],attr4=>[value7, value8]}, ...]'
              
