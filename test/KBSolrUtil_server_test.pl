@@ -56,7 +56,7 @@ eval {
     my $ret_gnms;
     eval {
         $solrgnm = $impl->search_solr({
-          solr_core => "GenomeFeatures_prod",
+          search_core => "GenomeFeatures_prod",
           search_param => {
                 rows => 100000,
                 wt => 'json'
@@ -108,11 +108,11 @@ eval {
     ok(defined($solrcount),"get_total_count command returned result.");
 =cut   
 
-=begin
+#=begin
     my $solrret;
     eval {
         $solrret = $impl->search_solr({
-          solr_core => "Reactions",
+          search_core => "Reactions",
           search_param => {},
           search_query => {'abbreviation'=>'RXNQT-4349.c'}, #{q=>"*"},
           result_format => "json",
@@ -127,14 +127,14 @@ eval {
          print Dumper($solrret) ."\n";
     }
     ok(defined($solrret),"_search_solr command returned result.");
-=cut   
+#=cut   
 
-#=begin
+=begin
    my $solrret; 
 #=begin
     eval {
         $solrret = $impl->search_kbase_solr({
-          solr_core => "taxonomy_ci",
+          search_core => "taxonomy_ci",
           search_param => {
                 fl => 'taxonomy_id,domain,aliases',
                 wt => 'json',
@@ -167,7 +167,7 @@ eval {
 =begin
     eval {
         $solrret = $impl->search_kbase_solr({
-          solr_core => "taxonomy_ci",
+          search_core => "taxonomy_ci",
           search_param => "{\"fl\":\"*\",\"start\":0,\"rows\":10}",
           search_query => "{\"parent_taxon_ref\":\"1779/116411/1\",\"rank\":\"species\",\"scientific_lineage\":\"cellular organisms; Bacteria; Proteobacteria; Alphaproteobacteria; Rhizobiales; Bradyrhizobiaceae; Bradyrhizobium\",\"scientific_name\":\"Bradyrhizobium sp. *\",\"domain\":\"Bacteria\"}",
           result_format => "json",
@@ -183,7 +183,7 @@ eval {
     }
     ok(defined($solrret),"search_kbase_solr command returned result.");
 =cut
-
+=cut
     my $inputObjs = [ 
       {
         "taxonomy_id"=>1297193,
@@ -309,7 +309,7 @@ eval {
 
 =begin 
     eval {
-        $jsonret = $impl->add_json_2solr({solr_core=>"BiochemData", json_data=>$json_out});
+        $jsonret = $impl->add_json_2solr({search_core=>"BiochemData", json_data=>$json_out});
     };
     ok(!$@, "add_json_2solr command successful");
     if ($@) { 

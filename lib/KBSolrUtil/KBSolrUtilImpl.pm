@@ -1050,7 +1050,7 @@ sub exists_in_solr
     #BEGIN exists_in_solr
     $params = $self->util_initialize_call($params,$ctx);
     $params = $self->util_args($params,[],{
-        search_core => "GenomeFeatures_ci",
+        search_core => "Genomes_ci",
         search_query => {q=>"*"},
     });  
     my $solrCore = $params->{search_core}; 
@@ -1150,7 +1150,7 @@ sub get_total_count
     my $output;
     eval {
         $solrout = $self->search_solr({
-                solr_core => $solrCore, 
+                search_core => $solrCore, 
                 search_param => {fl=>"*",wt=>"json",rows=>0}, 
                 search_query => $query, 
                 result_format => "json", 
@@ -1250,14 +1250,14 @@ sub search_solr
     #BEGIN search_solr
     $params = $self->util_initialize_call($params,$ctx);
     $params = $self->util_args($params,[],{
-        solr_core => "GenomeFeatures_ci",
+        search_core => "Genomes_ci",
         search_param => {},
         search_query => {q=>"*"},
         result_format => "xml",
         group_option => "",
         skip_escape => {}
     });  
-    my $solrCore = $params->{solr_core}; 
+    my $solrCore = $params->{search_core}; 
     my $searchParam = $params->{search_param};
     my $searchQuery = $params->{search_query};
     my $resultFormat = $params->{result_format};
@@ -1373,14 +1373,14 @@ sub search_kbase_solr
     #BEGIN search_kbase_solr
     $params = $self->util_initialize_call($params,$ctx);
     $params = $self->util_args($params,[],{
-        solr_core => "GenomeFeatures_ci",
+        search_core => "Genomes_ci",
         search_param => {},
         search_query => {q=>"*"},
         result_format => "xml",
         group_option => "",
         skip_escape => {}
     });  
-    my $solrCore = $params->{solr_core}; 
+    my $solrCore = $params->{search_core}; 
     my $searchParam = $params->{search_param};
     my $searchQuery = $params->{search_query};
     my $resultFormat = $params->{result_format};
