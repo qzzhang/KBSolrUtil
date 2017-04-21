@@ -20,14 +20,14 @@
             "dropdown_options":{
                 "options": [
                 {
-                  "value": "taxonomy in CI",
-                  "display": "taxonomy_ci",
+                  "display": "taxonomy in CI",
+                  "value": "taxonomy_ci",
                   "id": "taxonomy_ci",
                   "ui_name": "taxonomy_ci"
                 },
                 {
-                  "value": "taxonomy in production",
-                  "display": "taxonomy_prod",
+                  "display": "taxonomy in production",
+                  "value": "taxonomy_prod",
                   "id": "taxonomy_prod",
                   "ui_name": "taxonomy_prod"
                 },
@@ -50,8 +50,8 @@
                   "ui_name": "Genomes_prod"
                 },
                 {
-                  "value": "Biochemical Compounds",
-                  "display": "Compounds",
+                  "display": "Biochemical Compounds",
+                  "value": "Compounds",
                   "id": "Compounds",
                   "ui_name": "Compounds"
                 },
@@ -62,8 +62,8 @@
                   "ui_name": "Subsystems"
                 },
                 {
-                  "value": "Biochemical Reactions",
-                  "display": "Reactions",
+                  "display": "Biochemical Reactions",
+                  "value": "Reactions",
                   "id": "Reactions",
                   "ui_name": "Reactions"
                 },
