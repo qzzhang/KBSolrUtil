@@ -131,6 +131,7 @@ eval {
 
 #=begin
    my $solrret; 
+#=begin
     eval {
         $solrret = $impl->search_kbase_solr({
           solr_core => "taxonomy_ci",
@@ -148,9 +149,9 @@ eval {
                 rank => 'species',
                 scientific_lineage => 'cellular organisms; Bacteria; Proteobacteria; Alphaproteobacteria; Rhizobiales; Bradyrhizobiaceae; Bradyrhizobium',
                 scientific_name => 'Bradyrhizobium sp. *',
-                domain => 'Bacteria'
+                domain => 'Bacteria'     
           },
-          result_format => "xml",
+          result_format => "json",
           group_option => "",
           skip_escape => {}
         });  
@@ -163,6 +164,25 @@ eval {
     }
     ok(defined($solrret),"search_kbase_solr command returned result.");
 #=cut
+=begin
+    eval {
+        $solrret = $impl->search_kbase_solr({
+          solr_core => "taxonomy_ci",
+          search_param => "{\"fl\":\"*\",\"start\":0,\"rows\":10}",
+          search_query => "{\"parent_taxon_ref\":\"1779/116411/1\",\"rank\":\"species\",\"scientific_lineage\":\"cellular organisms; Bacteria; Proteobacteria; Alphaproteobacteria; Rhizobiales; Bradyrhizobiaceae; Bradyrhizobium\",\"scientific_name\":\"Bradyrhizobium sp. *\",\"domain\":\"Bacteria\"}",
+          result_format => "json",
+          group_option => "",
+          skip_escape => {}
+        });  
+    };
+    ok(!$@, "search_kbase_solr command successful");
+    if ($@) { 
+         print "ERROR:".$@;
+    } else {
+         print Dumper($solrret) ."\n";
+    }
+    ok(defined($solrret),"search_kbase_solr command returned result.");
+=cut
 
     my $inputObjs = [ 
       {

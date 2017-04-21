@@ -172,13 +172,18 @@ sub _buildQueryString {
         $self->{errmsg} = "Query parameters not specified";
         return undef;
     }
-    
+
+    if (ref($searchQuery) ne "HASH") {#convert the json string to HASH first
+        $searchQuery = JSON::from_json($searchQuery);
+    } 
+    if (ref($searchParams) ne "HASH") {#convert the json string to HASH first
+        $searchParams = JSON::from_json($searchParams);
+    } 
     # Build the display parameter part                                             
     my $paramFields = "";
     if( $resultFormat ne "xml" ) {
         $paramFields .= "wt=". URI::Escape::uri_escape($resultFormat) . "&";
     }
-print Dumper($searchParams);    
     foreach my $key (keys %$searchParams) {
         if( $key eq "wt" ) {
             #do nothing, wt is set according to the value of $resultFormat and default to 'xml'
