@@ -82,7 +82,7 @@
             "advanced": false,
             "allow_multiple": false,
             "default_values": [ "" ],
-            "field_type": "text",
+            "field_type": "textarea",
             "text_options": {
                 "validate_as": "text"
             }
@@ -121,3 +121,4 @@
     },
     "job_id_output_field": "docker"
 }
+

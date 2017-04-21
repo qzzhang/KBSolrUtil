@@ -36,6 +36,10 @@ parameters :
         ui-name : |
             Data to Index
         short-hint : |
-            The data to be indexed in Solr
+            The data to be indexed in Solr, in the form of an array of hashes
+        long-hing : |
+            The data to be indexed in Solr, in the form of an array of hashes.
+            For example:'[{attr1=>[value1, value2],attr2=>[value3, value4]},{attr3=>[value5, value6],attr4=>[value7, value8]}, ...]'
+             
 description : |
     <p>This method is designed to send data to Solr for indexing.</p>

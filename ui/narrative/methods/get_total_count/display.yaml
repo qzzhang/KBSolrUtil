@@ -36,6 +36,8 @@ parameters :
         ui-name : |
             Search Criteria
         short-hint : |
-            Specifies the criteria in a list of key=>value pairs
+            A JSON string specifying the criteria in key:value pairs
+        long-hint : |
+            For example: '{"parent_taxon_ref":"1779/116411/1","rank":"species","scientific_lineage":"cellular organisms; Bacteria; Proteobacteria; Alphaproteobacteria; Rhizobiales; Bradyrhizobiaceae; Bradyrhizobium","scientific_name":"Bradyrhizobium sp.*","domain":"Bacteria"}'
 description : |
     <p>The get_total_count method is implemented for searching data from a SOLR database and returning the count.</p>

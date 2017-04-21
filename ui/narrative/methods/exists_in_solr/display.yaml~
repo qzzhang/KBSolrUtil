@@ -38,6 +38,6 @@ parameters :
         short-hint : |
             A JSON string specifying the criteria in key:value pairs
         long-hint : |
-            For example: '{"parent_taxon_ref":"1779/116411/1","rank":"species","scientific_lineage":"cellular organisms; Bacteria; Proteobacteria; Alphaproteobacteria; Rhizobiales; Bradyrhizobiaceae; Bradyrhizobium","scientific_name":"Bradyrhizobium sp.*","domain":"Bacteria"'}
+            For example: "{\"parent_taxon_ref\":\"1779/116411/1\",\"rank\":\"species\",\"scientific_lineage\":\"cellular organisms; Bacteria; Proteobacteria; Alphaproteobacteria; Rhizobiales; Bradyrhizobiaceae; Bradyrhizobium\",\"scientific_name\":\"Bradyrhizobium sp.*\",\"domain\":\"Bacteria\"}"
 description : |
     <p>The exists_in_solr method is implemented for checking if any document with the given search query exists in the given SOLR database.</p>

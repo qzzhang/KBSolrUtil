@@ -39,3 +39,4 @@ parameters :
             Specifies the JSON docs in a string, can be inside an array, such as '[{json_doc1}, {json_doc2},...]'
 description : |
     <p>Send and index JSON doc data into a SOLR database.</p>
+
