@@ -169,8 +169,16 @@
             ],
             "output_mapping": [
                 {
-                    "service_method_output_path": [0, "search_result"],
+                    "service_method_output_path": [0],
                     "target_property": "search_result"
+                },
+                {
+                    "input_parameter": "search_core",
+                    "target_property": "search_core"
+                },
+                {
+                    "input_parameter": "search_query",
+                    "target_property": "input_search_query"
                 },
                 {
                 "narrative_system_variable": "workspace",
