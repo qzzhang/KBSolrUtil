@@ -81,7 +81,7 @@
             "optional": false,
             "advanced": false,
             "allow_multiple": false,
-            "default_values": [ "{\"q\"=>\"*\"}" ],
+            "default_values": [ "{\"q\":\"*\"}" ],
             "field_type": "text",
             "text_options": {
                 "validate_ws_types": [ "KBSolrUtil.searchdata" ]

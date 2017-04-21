@@ -176,7 +176,7 @@ sub _buildQueryString {
     if (ref($searchQuery) ne "HASH") {#convert the json string to HASH first
         $searchQuery = JSON::from_json($searchQuery);
     } 
-    if (ref($searchParams) ne "HASH") {#convert the json string to HASH first
+    if ($searchParams && (ref($searchParams) ne "HASH")) {#convert the json string to HASH first
         $searchParams = JSON::from_json($searchParams);
     } 
     # Build the display parameter part                                             
@@ -1057,7 +1057,13 @@ sub exists_in_solr
     my $searchQuery = $params->{search_query};
     
     $output = $self->_exists($solrCore, $searchQuery);
-    
+
+    if($output == 1) {
+        print "Found record in solr database";
+    } else {
+        print "No record found in solr database";
+    }
+            
     #END exists_in_solr
     my @_bad_returns;
     (!ref($output)) or push(@_bad_returns, "Invalid type for return variable \"output\" (value was \"$output\")");
@@ -1158,6 +1164,8 @@ sub get_total_count
     } else {
         $output = $solrout->{response}->{response}->{numFound};
     }
+    
+    print "The total count of documents found= ". $output;
     #END get_total_count
     my @_bad_returns;
     (!ref($output)) or push(@_bad_returns, "Invalid type for return variable \"output\" (value was \"$output\")");
@@ -1390,6 +1398,7 @@ sub search_kbase_solr
     my $solr_response = $self->_sendRequest("$solrQuery", "GET");
     $output = {solr_search_result=>$solr_response->{response}};
 
+    print "Search results;\n" . $output->{'solr_search_result'};
     #END search_kbase_solr
     my @_bad_returns;
     (ref($output) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"output\" (value was \"$output\")");
