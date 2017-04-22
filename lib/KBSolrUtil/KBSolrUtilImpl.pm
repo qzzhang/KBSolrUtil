@@ -1271,7 +1271,7 @@ sub search_solr
     my $queryString = $self->_buildQueryString($searchQuery, $searchParam, $groupOption, $resultFormat, $skipEscape);
     print "Search query string:\n$queryString\n";
     my $solrQuery = $self->{_SOLR_URL}."/".$solrCore."/select?".$queryString;
-    
+   print "With solr url:\n$solrQuery\n"; 
     my $solr_response = $self->_sendRequest("$solrQuery", "GET");
     my $responseCode = $self->_parseResponse($solr_response, $resultFormat);
         
