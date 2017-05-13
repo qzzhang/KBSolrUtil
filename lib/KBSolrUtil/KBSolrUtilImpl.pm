@@ -503,7 +503,7 @@ sub _addJSON2Solr
             $self->{error} = $response;
             $self->{error}->{errmsg} = $@;
             print "\nSolr indexing error:\n" . $self->_error->{response}; 
-            print "\n" . Dumper($response);
+            #print "\n" . Dumper($response);
             return 0;
     }
 #=cut
@@ -539,7 +539,6 @@ sub _addXML2Solr
     
     my $ds = $self->_rawDsToSolrDs($params);
     my $doc = $self->_toXML($ds, 'add');
-    #print Dumper($doc);
     my $commit = $self->{_AUTOCOMMIT} ? 'true' : 'false';
     my $url = "$self->{_SOLR_URL}/$solrCore/update?commit=true";# . $commit;
     my $response = $self->_sendRequest($url, 'POST', undef, $self->{_CT_XML}, $doc);
@@ -548,7 +547,7 @@ sub _addXML2Solr
             $self->{error} = $response;
             $self->{error}->{errmsg} = $@;
             print "\nSolr indexing error:\n" . $self->_error->{response}; 
-            print "\n" . Dumper($response);
+            #print "\n" . Dumper($response);
             return 0;
     }
     return 1;
@@ -1059,9 +1058,9 @@ sub exists_in_solr
     $output = $self->_exists($solrCore, $searchQuery);
 
     if($output == 1) {
-        print "Found record in solr database";
+        #print "Found record in solr database";
     } else {
-        print "No record found in solr database";
+        #print "No record found in solr database";
     }
             
     #END exists_in_solr
@@ -1159,7 +1158,7 @@ sub get_total_count
             });
     };
     if ($@) {
-        print "ERROR:".$@;
+        #print "ERROR:".$@;
         $output = -1;
     } else {
         $output = $solrout->{response}->{response}->{numFound};
@@ -1269,7 +1268,7 @@ sub search_solr
     }
 
     my $queryString = $self->_buildQueryString($searchQuery, $searchParam, $groupOption, $resultFormat, $skipEscape);
-    print "Search query string:\n$queryString\n";
+    #print "Search query string:\n$queryString\n";
     my $solrQuery = $self->{_SOLR_URL}."/".$solrCore."/select?".$queryString;
     
     my $solr_response = $self->_sendRequest("$solrQuery", "GET");
@@ -1392,13 +1391,13 @@ sub search_kbase_solr
     }
 
     my $queryString = $self->_buildQueryString($searchQuery, $searchParam, $groupOption, $resultFormat, $skipEscape);
-    print "Search query string:\n$queryString\n";
+    #print "Search query string:\n$queryString\n";
     my $solrQuery = $self->{_SOLR_URL}."/".$solrCore."/select?".$queryString;
     
     my $solr_response = $self->_sendRequest("$solrQuery", "GET");
     $output = {solr_search_result=>$solr_response->{response}};
 
-    print "Search results;\n" . $output->{'solr_search_result'};
+    #print "Search results;\n" . $output->{'solr_search_result'};
     #END search_kbase_solr
     my @_bad_returns;
     (ref($output) eq 'HASH') or push(@_bad_returns, "Invalid type for return variable \"output\" (value was \"$output\")");
