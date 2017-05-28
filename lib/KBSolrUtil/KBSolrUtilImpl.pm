@@ -960,8 +960,8 @@ sub index_in_solr
     my $solrCore = $params->{solr_core};
 
     if( @{$docData} >= 1) {
-       #if( $self->_addXML2Solr($solrCore, $docData) == 1 ) {
-       if( $self->_addJSON2Solr($solrCore, $docData) == 1 ) {
+       if( $self->_addXML2Solr($solrCore, $docData) == 1 ) {
+           #if( $self->_addJSON2Solr($solrCore, $docData) == 1 ) {
            #commit the additions
            if (!$self->_commit($solrCore)) {
                die $self->_error->{response};
