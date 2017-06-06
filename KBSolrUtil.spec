@@ -38,7 +38,7 @@ module KBSolrUtil {
     funcdef index_in_solr(IndexInSolrParams params) returns (int output) authentication required;
     
     /*
-        Arguments for the nonexistants function - search solr according to the parameters passed and return the ones not found in solr.
+        Arguments for the new_or_updated function - search solr according to the parameters passed and return the ones not found in solr.
         
         string search_core - the name of the solr core to be searched
         list<searchdata> search_docs - a list of arbitrary user-supplied key-value pairs specifying the definitions of docs 
@@ -59,12 +59,12 @@ module KBSolrUtil {
     typedef structure {
        string search_core;
        list<searchdata> search_docs;
-    } NonExistantsParams;
+    } NewOrUpdatedParams;
 
     /*
-        The nonexistants function that returns a list of docs
+        The new_or_updated function that returns a list of docs
     */
-    funcdef nonexistants(NonExistantsParams params) returns (list<searchdata>) authentication required;
+    funcdef new_or_updated(NewOrUpdatedParams params) returns (list<searchdata>) authentication required;
 
     /*
         Arguments for the exists_in_solr function - search solr according to the parameters passed and return 1 if found at least one doc 0 if nothing found. A shorter version of search_solr.

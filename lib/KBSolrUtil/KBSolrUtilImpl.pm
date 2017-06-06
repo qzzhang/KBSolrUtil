@@ -5,7 +5,7 @@ use Bio::KBase::Exceptions;
 # http://semver.org 
 our $VERSION = '0.0.2';
 our $GIT_URL = 'https://github.com/qzzhang/KBSolrUtil.git';
-our $GIT_COMMIT_HASH = 'eb01eb54d0b93c2509fd25246c1660bf5aeba6bf';
+our $GIT_COMMIT_HASH = '2f805ad70b619588d4f7a0c2e07690479a1f39f6';
 
 =head1 NAME
 
@@ -1046,9 +1046,9 @@ sub index_in_solr
 
 
 
-=head2 nonexistants
+=head2 new_or_updated
 
-  $return = $obj->nonexistants($params)
+  $return = $obj->new_or_updated($params)
 
 =over 4
 
@@ -1057,9 +1057,9 @@ sub index_in_solr
 =begin html
 
 <pre>
-$params is a KBSolrUtil.NonExistantsParams
+$params is a KBSolrUtil.NewOrUpdatedParams
 $return is a reference to a list where each element is a KBSolrUtil.searchdata
-NonExistantsParams is a reference to a hash where the following keys are defined:
+NewOrUpdatedParams is a reference to a hash where the following keys are defined:
 	search_core has a value which is a string
 	search_docs has a value which is a reference to a list where each element is a KBSolrUtil.searchdata
 searchdata is a reference to a hash where the key is a string and the value is a string
@@ -1070,9 +1070,9 @@ searchdata is a reference to a hash where the key is a string and the value is a
 
 =begin text
 
-$params is a KBSolrUtil.NonExistantsParams
+$params is a KBSolrUtil.NewOrUpdatedParams
 $return is a reference to a list where each element is a KBSolrUtil.searchdata
-NonExistantsParams is a reference to a hash where the following keys are defined:
+NewOrUpdatedParams is a reference to a hash where the following keys are defined:
 	search_core has a value which is a string
 	search_docs has a value which is a reference to a list where each element is a KBSolrUtil.searchdata
 searchdata is a reference to a hash where the key is a string and the value is a string
@@ -1084,13 +1084,13 @@ searchdata is a reference to a hash where the key is a string and the value is a
 
 =item Description
 
-The nonexistants function that returns a list of docs
+The new_or_updated function that returns a list of docs
 
 =back
 
 =cut
 
-sub nonexistants
+sub new_or_updated
 {
     my $self = shift;
     my($params) = @_;
@@ -1098,14 +1098,14 @@ sub nonexistants
     my @_bad_arguments;
     (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument \"params\" (value was \"$params\")");
     if (@_bad_arguments) {
-	my $msg = "Invalid arguments passed to nonexistants:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	my $msg = "Invalid arguments passed to new_or_updated:\n" . join("", map { "\t$_\n" } @_bad_arguments);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-							       method_name => 'nonexistants');
+							       method_name => 'new_or_updated');
     }
 
     my $ctx = $KBSolrUtil::KBSolrUtilServer::CallContext;
     my($return);
-    #BEGIN nonexistants
+    #BEGIN new_or_updated
     $params = $self->util_initialize_call($params,$ctx);
     $params = $self->util_args($params,[],{
         solr_core => "GenomeFeatures_ci",
@@ -1116,22 +1116,23 @@ sub nonexistants
     my $solr_core = $params->{solr_core};
     if (defined($params->{search_docs})) {
         $src_docs = $params->{search_docs};
-	
-	foreach my $current_doc (@{src_docs}){
+        
+        foreach my $current_doc (@{src_docs}){
             my $en_status = $self->_checkEntryStatus( $current_doc, $solr_core );
             if( $gn_status=~/(new|updated)/i ) {
                 $current_doc->{gn_status} = $en_status;
                 push @{$return},$current_doc;
             }
-	}
+        }
     } 
-    #END nonexistants
+
+    #END new_or_updated
     my @_bad_returns;
     (ref($return) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"return\" (value was \"$return\")");
     if (@_bad_returns) {
-	my $msg = "Invalid returns passed to nonexistants:\n" . join("", map { "\t$_\n" } @_bad_returns);
+	my $msg = "Invalid returns passed to new_or_updated:\n" . join("", map { "\t$_\n" } @_bad_returns);
 	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
-							       method_name => 'nonexistants');
+							       method_name => 'new_or_updated');
     }
     return($return);
 }
@@ -1851,7 +1852,7 @@ doc_data has a value which is a reference to a list where each element is a KBSo
 
 
 
-=head2 NonExistantsParams
+=head2 NewOrUpdatedParams
 
 =over 4
 
@@ -1859,7 +1860,7 @@ doc_data has a value which is a reference to a list where each element is a KBSo
 
 =item Description
 
-Arguments for the nonexistants function - search solr according to the parameters passed and return the ones not found in solr.
+Arguments for the new_or_updated function - search solr according to the parameters passed and return the ones not found in solr.
 
 string search_core - the name of the solr core to be searched
 list<searchdata> search_docs - a list of arbitrary user-supplied key-value pairs specifying the definitions of docs 
