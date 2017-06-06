@@ -836,7 +836,7 @@ sub _clear_error
 
 #
 # Internal Method 
-# Name: _checkGenomeStatus
+# Name: _checkEntryStatus
 # Purpose: to check for a given genome's status against genomes in SOLR.  
 #
 # Input parameters :
@@ -845,7 +845,7 @@ sub _clear_error
 #
 # returns : a string stating the status
 #    
-sub _checkGenomeStatus 
+sub _checkEntryStatus 
 {
     my ($self, $current_genome, $solr_core, $gn_type) = @_;
     #print "\nChecking status for genome:\n " . Dumper($current_genome) . "\n";
@@ -1106,6 +1106,25 @@ sub nonexistants
     my $ctx = $KBSolrUtil::KBSolrUtilServer::CallContext;
     my($return);
     #BEGIN nonexistants
+    $params = $self->util_initialize_call($params,$ctx);
+    $params = $self->util_args($params,[],{
+        solr_core => "GenomeFeatures_ci",
+        search_docs => undef
+    });
+    
+    $return = [];
+    my $solr_core = $params->{solr_core};
+    if (defined($params->{search_docs})) {
+        $src_docs = $params->{search_docs};
+	
+	foreach my $current_doc (@{src_docs}){
+            my $en_status = $self->_checkEntryStatus( $current_doc, $solr_core );
+            if( $gn_status=~/(new|updated)/i ) {
+                $current_doc->{gn_status} = $en_status;
+                push @{$return},$current_doc;
+            }
+	}
+    } 
     #END nonexistants
     my @_bad_returns;
     (ref($return) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"return\" (value was \"$return\")");
