@@ -5,7 +5,7 @@ use Bio::KBase::Exceptions;
 # http://semver.org 
 our $VERSION = '0.0.2';
 our $GIT_URL = 'https://github.com/qzzhang/KBSolrUtil.git';
-our $GIT_COMMIT_HASH = '47b3f4b17612ddd1be381e9e25a2bd4912872507';
+our $GIT_COMMIT_HASH = 'eb01eb54d0b93c2509fd25246c1660bf5aeba6bf';
 
 =head1 NAME
 
@@ -1046,6 +1046,80 @@ sub index_in_solr
 
 
 
+=head2 nonexistants
+
+  $return = $obj->nonexistants($params)
+
+=over 4
+
+=item Parameter and return types
+
+=begin html
+
+<pre>
+$params is a KBSolrUtil.NonExistantsParams
+$return is a reference to a list where each element is a KBSolrUtil.searchdata
+NonExistantsParams is a reference to a hash where the following keys are defined:
+	search_core has a value which is a string
+	search_docs has a value which is a reference to a list where each element is a KBSolrUtil.searchdata
+searchdata is a reference to a hash where the key is a string and the value is a string
+
+</pre>
+
+=end html
+
+=begin text
+
+$params is a KBSolrUtil.NonExistantsParams
+$return is a reference to a list where each element is a KBSolrUtil.searchdata
+NonExistantsParams is a reference to a hash where the following keys are defined:
+	search_core has a value which is a string
+	search_docs has a value which is a reference to a list where each element is a KBSolrUtil.searchdata
+searchdata is a reference to a hash where the key is a string and the value is a string
+
+
+=end text
+
+
+
+=item Description
+
+The nonexistants function that returns a list of docs
+
+=back
+
+=cut
+
+sub nonexistants
+{
+    my $self = shift;
+    my($params) = @_;
+
+    my @_bad_arguments;
+    (ref($params) eq 'HASH') or push(@_bad_arguments, "Invalid type for argument \"params\" (value was \"$params\")");
+    if (@_bad_arguments) {
+	my $msg = "Invalid arguments passed to nonexistants:\n" . join("", map { "\t$_\n" } @_bad_arguments);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'nonexistants');
+    }
+
+    my $ctx = $KBSolrUtil::KBSolrUtilServer::CallContext;
+    my($return);
+    #BEGIN nonexistants
+    #END nonexistants
+    my @_bad_returns;
+    (ref($return) eq 'ARRAY') or push(@_bad_returns, "Invalid type for return variable \"return\" (value was \"$return\")");
+    if (@_bad_returns) {
+	my $msg = "Invalid returns passed to nonexistants:\n" . join("", map { "\t$_\n" } @_bad_returns);
+	Bio::KBase::Exceptions::ArgumentValidationError->throw(error => $msg,
+							       method_name => 'nonexistants');
+    }
+    return($return);
+}
+
+
+
+
 =head2 exists_in_solr
 
   $output = $obj->exists_in_solr($params)
@@ -1758,6 +1832,59 @@ doc_data has a value which is a reference to a list where each element is a KBSo
 
 
 
+=head2 NonExistantsParams
+
+=over 4
+
+
+
+=item Description
+
+Arguments for the nonexistants function - search solr according to the parameters passed and return the ones not found in solr.
+
+string search_core - the name of the solr core to be searched
+list<searchdata> search_docs - a list of arbitrary user-supplied key-value pairs specifying the definitions of docs 
+    to be searched, a hash for each doc, see the example below:
+        search_docs=[
+            {
+                field1 => 'val1',
+                field2 => 'val2',
+                domain => 'Bacteria'
+            },
+            {
+                field1 => 'val3',
+                field2 => 'val4',
+                domain => 'Bacteria'                     
+            }
+         ];
+
+
+=item Definition
+
+=begin html
+
+<pre>
+a reference to a hash where the following keys are defined:
+search_core has a value which is a string
+search_docs has a value which is a reference to a list where each element is a KBSolrUtil.searchdata
+
+</pre>
+
+=end html
+
+=begin text
+
+a reference to a hash where the following keys are defined:
+search_core has a value which is a string
+search_docs has a value which is a reference to a list where each element is a KBSolrUtil.searchdata
+
+
+=end text
+
+=back
+
+
+
 =head2 ExistsInputParams
 
 =over 4
@@ -1767,7 +1894,7 @@ doc_data has a value which is a reference to a list where each element is a KBSo
 =item Description
 
 Arguments for the exists_in_solr function - search solr according to the parameters passed and return 1 if found at least one doc 0 if nothing found. A shorter version of search_solr.
-
+        
 string search_core - the name of the solr core to be searched
 searchdata search_query - arbitrary user-supplied key-value pairs specifying the fields to be searched and their values to be matched, a hash which specifies how the documents will be searched, see the example below:
         search_query={
