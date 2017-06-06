@@ -835,23 +835,81 @@ sub _clear_error
 }
 
 #
-# method name: _error
-# returns the errors details that was occured during last transaction action.
-# params : -
-# returns : response details includes the following details
-#    {
-#       url => 'url which is being accessed',
-#       response => 'response from server',
-#       code => 'response code',
-#       errmsg => 'for any internal error error msg'
-#     }
+# Internal Method 
+# Name: _checkGenomeStatus
+# Purpose: to check for a given genome's status against genomes in SOLR.  
 #
-# Check error method for for getting the error details for last command
+# Input parameters :
+#       $current_genome is a genome object whose KBase status is to be checked.
+#       $solr_core is the name of the SOLR core
 #
-sub _error
+# returns : a string stating the status
+#    
+sub _checkGenomeStatus 
 {
-    my ($self) = @_;
-    return $self->{error};
+    my ($self, $current_genome, $solr_core, $gn_type) = @_;
+    #print "\nChecking status for genome:\n " . Dumper($current_genome) . "\n";
+    $gn_type = "KBaseGenomes.Genome-8.2" unless $gn_type;
+
+    my $status = "";
+    my $query = { 
+        genome_id => $current_genome->{id} . "*", 
+        object_type => $gn_type
+    };
+    my $params = {
+        fl => "genome_id",
+        wt => "json",
+        start => 0
+    };
+    
+    my $solrgnm;
+    my $gnms;
+    my $gcnt;
+    eval {
+        $solrgnm = $self->search_solr({
+          search_core => $solr_core,
+          search_param => $params,
+          search_query => $query,
+          result_format => "json",
+          group_option => "",
+          skip_escape => {}
+        });  
+    };   
+    if ($@) {
+         print "ERROR:".$@;
+         $status = "";
+    } else {
+        #print "Search results:" . Dumper($solrgnm->{response}) . "\n";
+        $gnms = $solrgnm->{response}->{response}->{docs};
+        $gcnt = $solrgnm->{response}->{response}->{numFound};
+    }
+    if( $gcnt == 0 ) {
+        $status = "New genome";
+    }
+    else {
+        for (my $i = 0; $i < @{$gnms}; $i++ ) {
+            my $record = $gnms->[$i];
+            my $gm_id = uc $record->{genome_id};
+
+            if ($gm_id eq uc $current_genome->{accession}){
+                $status = "Existing genome: current";
+                $current_genome->{genome_id} = $gm_id;
+                last;
+            }elsif ($gm_id =~/uc $current_genome->{id}/){
+                $status = "Existing genome: updated ";
+                $current_genome->{genome_id} = $gm_id;
+                last;
+            }
+        }
+    }
+        
+    if( $status eq "" )
+    {
+        $status = "New genome";#or "Existing genome: status unknown";
+    }
+    
+    #print "\nStatus:$status\n";
+    return $status;
 }
 
 #################### End subs for accessing SOLR #######################
