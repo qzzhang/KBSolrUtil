@@ -5,7 +5,7 @@ use Bio::KBase::Exceptions;
 # http://semver.org 
 our $VERSION = '0.0.2';
 our $GIT_URL = 'https://github.com/qzzhang/KBSolrUtil.git';
-our $GIT_COMMIT_HASH = '2f805ad70b619588d4f7a0c2e07690479a1f39f6';
+our $GIT_COMMIT_HASH = '1016fadfaf48ddfdcc4d33bad6d6b9ae39d8adeb';
 
 =head1 NAME
 
@@ -840,21 +840,21 @@ sub _clear_error
 # Purpose: to check for a given genome's status against genomes in SOLR.  
 #
 # Input parameters :
-#       $current_genome is a genome object whose KBase status is to be checked.
+#       $current_entry is a genome object whose KBase status is to be checked.
 #       $solr_core is the name of the SOLR core
 #
 # returns : a string stating the status
 #    
 sub _checkEntryStatus 
 {
-    my ($self, $current_genome, $solr_core, $gn_type) = @_;
-    #print "\nChecking status for genome:\n " . Dumper($current_genome) . "\n";
-    $gn_type = "KBaseGenomes.Genome-8.2" unless $gn_type;
+    my ($self, $current_entry, $solr_core, $en_type) = @_;
+    #print "\nChecking status for genome:\n " . Dumper($current_entry) . "\n";
+    $en_type = "KBaseGenomes.Genome-8.2" unless $en_type;
 
     my $status = "";
     my $query = { 
-        genome_id => $current_genome->{id} . "*", 
-        object_type => $gn_type
+        genome_id => $current_entry->{id} . "*", 
+        object_type => $en_type
     };
     my $params = {
         fl => "genome_id",
@@ -879,25 +879,25 @@ sub _checkEntryStatus
          print "ERROR:".$@;
          $status = "";
     } else {
-        #print "Search results:" . Dumper($solrgnm->{response}) . "\n";
+        print "Search results:" . Dumper($solrgnm->{response}) . "\n";
         $gnms = $solrgnm->{response}->{response}->{docs};
         $gcnt = $solrgnm->{response}->{response}->{numFound};
     }
     if( $gcnt == 0 ) {
-        $status = "New genome";
+        $status = "New entry";
     }
     else {
         for (my $i = 0; $i < @{$gnms}; $i++ ) {
             my $record = $gnms->[$i];
             my $gm_id = uc $record->{genome_id};
 
-            if ($gm_id eq uc $current_genome->{accession}){
-                $status = "Existing genome: current";
-                $current_genome->{genome_id} = $gm_id;
+            if ($gm_id eq uc $current_entry->{accession}){
+                $status = "Existing entry: current";
+                $current_entry->{genome_id} = $gm_id;
                 last;
-            }elsif ($gm_id =~/uc $current_genome->{id}/){
-                $status = "Existing genome: updated ";
-                $current_genome->{genome_id} = $gm_id;
+            }elsif ($gm_id =~/uc $current_entry->{id}/){
+                $status = "Existing entry: updated ";
+                $current_entry->{genome_id} = $gm_id;
                 last;
             }
         }
@@ -905,7 +905,7 @@ sub _checkEntryStatus
         
     if( $status eq "" )
     {
-        $status = "New genome";#or "Existing genome: status unknown";
+        $status = "New entry";#or "Existing entry: status unknown";
     }
     
     #print "\nStatus:$status\n";
@@ -1062,6 +1062,7 @@ $return is a reference to a list where each element is a KBSolrUtil.searchdata
 NewOrUpdatedParams is a reference to a hash where the following keys are defined:
 	search_core has a value which is a string
 	search_docs has a value which is a reference to a list where each element is a KBSolrUtil.searchdata
+	search_type has a value which is a string
 searchdata is a reference to a hash where the key is a string and the value is a string
 
 </pre>
@@ -1075,6 +1076,7 @@ $return is a reference to a list where each element is a KBSolrUtil.searchdata
 NewOrUpdatedParams is a reference to a hash where the following keys are defined:
 	search_core has a value which is a string
 	search_docs has a value which is a reference to a list where each element is a KBSolrUtil.searchdata
+	search_type has a value which is a string
 searchdata is a reference to a hash where the key is a string and the value is a string
 
 
@@ -1109,17 +1111,18 @@ sub new_or_updated
     $params = $self->util_initialize_call($params,$ctx);
     $params = $self->util_args($params,[],{
         solr_core => "GenomeFeatures_ci",
-        search_docs => undef
+        search_docs => undef,
+        search_type => "KBaseGenomes.Genome-12.3"
     });
     
     $return = [];
     my $solr_core = $params->{solr_core};
     if (defined($params->{search_docs})) {
-        $src_docs = $params->{search_docs};
+        my $src_docs = $params->{search_docs};
         
-        foreach my $current_doc (@{src_docs}){
-            my $en_status = $self->_checkEntryStatus( $current_doc, $solr_core );
-            if( $gn_status=~/(new|updated)/i ) {
+        foreach my $current_doc (@{$src_docs}){
+            my $en_status = $self->_checkEntryStatus( $current_doc, $solr_core, $params->{search_type} );
+            if( $en_status=~/(new|updated)/i ) {
                 $current_doc->{gn_status} = $en_status;
                 push @{$return},$current_doc;
             }
@@ -1423,6 +1426,7 @@ sub search_solr
     my $queryString = $self->_buildQueryString($searchQuery, $searchParam, $groupOption, $resultFormat, $skipEscape);
     #print "Search query string:\n$queryString\n";
     my $solrQuery = $self->{_SOLR_URL}."/".$solrCore."/select?".$queryString;
+    #print "Search query string:\n$solrQuery\n";
     
     my $solr_response = $self->_sendRequest("$solrQuery", "GET");
     my $responseCode = $self->_parseResponse($solr_response, $resultFormat);
@@ -1877,6 +1881,7 @@ list<searchdata> search_docs - a list of arbitrary user-supplied key-value pairs
                 domain => 'Bacteria'                     
             }
          ];
+string search_type - the object (genome) type to be searched
 
 
 =item Definition
@@ -1887,6 +1892,7 @@ list<searchdata> search_docs - a list of arbitrary user-supplied key-value pairs
 a reference to a hash where the following keys are defined:
 search_core has a value which is a string
 search_docs has a value which is a reference to a list where each element is a KBSolrUtil.searchdata
+search_type has a value which is a string
 
 </pre>
 
@@ -1897,6 +1903,7 @@ search_docs has a value which is a reference to a list where each element is a K
 a reference to a hash where the following keys are defined:
 search_core has a value which is a string
 search_docs has a value which is a reference to a list where each element is a KBSolrUtil.searchdata
+search_type has a value which is a string
 
 
 =end text

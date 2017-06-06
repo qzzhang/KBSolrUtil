@@ -55,10 +55,12 @@ module KBSolrUtil {
                         domain => 'Bacteria'                     
                     }
                  ];
+        string search_type - the object (genome) type to be searched
     */
     typedef structure {
        string search_core;
        list<searchdata> search_docs;
+       string search_type;
     } NewOrUpdatedParams;
 
     /*
