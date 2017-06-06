@@ -90,6 +90,12 @@
                   "display": "Roles",
                   "id": "Roles",
                   "ui_name": "Roles"
+                },
+                {
+                  "value": "biochemistry",
+                  "display": "biochem_test",
+                  "id": "biochemistry",
+                  "ui_name": "biochemistry"
                 }
               ]
             }
