@@ -38,8 +38,37 @@ module KBSolrUtil {
     funcdef index_in_solr(IndexInSolrParams params) returns (int output) authentication required;
     
     /*
-        Arguments for the exists_in_solr function - search solr according to the parameters passed and return 1 if found at least one doc 0 if nothing found. A shorter version of search_solr.
+        Arguments for the nonexistants function - search solr according to the parameters passed and return the ones not found in solr.
         
+        string search_core - the name of the solr core to be searched
+        list<searchdata> search_docs - a list of arbitrary user-supplied key-value pairs specifying the definitions of docs 
+            to be searched, a hash for each doc, see the example below:
+                search_docs=[
+                    {
+                        field1 => 'val1',
+                        field2 => 'val2',
+                        domain => 'Bacteria'
+                    },
+                    {
+                        field1 => 'val3',
+                        field2 => 'val4',
+                        domain => 'Bacteria'                     
+                    }
+                 ];
+    */
+    typedef structure {
+       string search_core;
+       list<searchdata> search_docs;
+    } NonExistantsParams;
+
+    /*
+        The nonexistants function that returns a list of docs
+    */
+    funcdef nonexistants(NonExistantsParams params) returns (list<searchdata>) authentication required;
+
+    /*
+        Arguments for the exists_in_solr function - search solr according to the parameters passed and return 1 if found at least one doc 0 if nothing found. A shorter version of search_solr.
+                
         string search_core - the name of the solr core to be searched
         searchdata search_query - arbitrary user-supplied key-value pairs specifying the fields to be searched and their values to be matched, a hash which specifies how the documents will be searched, see the example below:
                 search_query={
@@ -61,8 +90,7 @@ module KBSolrUtil {
         The exists_in_solr function that returns 0 or 1
     */
     funcdef exists_in_solr(ExistsInputParams params) returns (int output) authentication required;
-    
-    
+
     /*
         Arguments for the get_total_count function - search solr according to the parameters passed and return the count of docs found, or -1 if error.
         
