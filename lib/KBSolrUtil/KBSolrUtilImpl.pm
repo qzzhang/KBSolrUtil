@@ -852,7 +852,7 @@ sub _checkTaxonStatus
     my $status = "";
     my $query = { taxonomy_id => $current_genome->{tax_id} };
     
-    if($self->exists_in_solr({search_core=>$solr_core,search_query=>{taxonomy_id=>$current_genome->{tax_id}}})==1) {
+    if($self->exists_in_solr({search_core=>$solr_core,search_query=>$query})==1) {
         $status = "Taxon in KBase";
     }    
     else {
