@@ -834,6 +834,35 @@ sub _clear_error
     $self->{error} = undef;
 }
 
+
+#
+# Internal Method: to check if a given genome has been indexed by KBase in SOLR.  Returns a string stating the status
+#
+# Input parameters :
+# $current_genome is a genome object whose KBase status is to be checked.
+# $solr_core is the name of the SOLR core
+#
+# returns : a string stating the status
+#    
+sub _checkTaxonStatus
+{
+    my ($self, $current_genome, $solr_core) = @_;
+    #print "\nChecking taxon status for genome:\n " . Dumper($current_genome) . "\n";
+    
+    my $status = "";
+    my $query = { taxonomy_id => $current_genome->{tax_id} };
+    
+    if($self->exists_in_solr({search_core=>$solr_core,search_query=>{taxonomy_id=>$current_genome->{tax_id}}})==1) {
+        $status = "Taxon in KBase";
+    }    
+    else {
+        $status = "Taxon not found";
+    }
+    #print "\nStatus:$status\n";
+    return $status;
+}
+
+
 #
 # Internal Method 
 # Name: _checkEntryStatus
@@ -1117,12 +1146,14 @@ sub new_or_updated
     
     $return = [];
     my $solr_core = $params->{solr_core};
+    my $tx_solr_core = ($solr_core =~ /prod$/i) ? "taxonomy_prod" : "taxonomy_ci";
     if (defined($params->{search_docs})) {
         my $src_docs = $params->{search_docs};
         
         foreach my $current_doc (@{$src_docs}){
             my $en_status = $self->_checkEntryStatus( $current_doc, $solr_core, $params->{search_type} );
-            if( $en_status=~/(new|updated)/i ) {
+	    my $tx_status = $self->_checkTaxonStatus($current_doc, $tx_solr_core);
+            if( $en_status=~/(new|updated)/i && $tx_status=~/in KBase/i ) {
                 $current_doc->{gn_status} = $en_status;
                 push @{$return},$current_doc;
             }
