@@ -879,7 +879,7 @@ sub _checkEntryStatus
          print "ERROR:".$@;
          $status = "";
     } else {
-        print "Search results:" . Dumper($solrgnm->{response}) . "\n";
+        #print "Search results:" . Dumper($solrgnm->{response}) . "\n";
         $gnms = $solrgnm->{response}->{response}->{docs};
         $gcnt = $solrgnm->{response}->{response}->{numFound};
     }
