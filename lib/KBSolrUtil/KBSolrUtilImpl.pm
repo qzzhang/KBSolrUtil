@@ -1147,6 +1147,7 @@ sub new_or_updated
     $return = [];
     my $solr_core = $params->{solr_core};
     my $tx_solr_core = ($solr_core =~ /prod$/i) ? "taxonomy_prod" : "taxonomy_ci";
+
     if (defined($params->{search_docs})) {
         my $src_docs = $params->{search_docs};
         
