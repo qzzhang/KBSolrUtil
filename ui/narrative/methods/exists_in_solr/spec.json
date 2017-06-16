@@ -44,6 +44,12 @@
                   "ui_name": "Genomes_ci"
                 },
                 {
+                  "value": "GenomeFeatures_prod",
+                  "display": "Genome Features in production",
+                  "id": "GenomeFeatures_prod",
+                  "ui_name": "GenomeFeatures_prod"
+                },
+                {
                   "value": "Genomes_prod",
                   "display": "Genomes in production",
                   "id": "Genomes_prod",
