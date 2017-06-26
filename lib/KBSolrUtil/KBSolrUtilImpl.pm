@@ -1662,12 +1662,24 @@ sub add_json_2solr
     $params = $self->util_initialize_call($params,$ctx);
     $params = $self->util_args($params,[],{
         solr_core => "Genomes_ci",
-        json_data => ""
+        json_data => "",
+        is_json_string => undef
     });  
     my $solrCore = $params->{solr_core};
     my $docs = $params->{json_data}; 
+    my $isJson = undef;
+    if (!defined($params->{is_json_string})) {
+        $isJson = 0;
+    }
+    else {
+        $isJson = $params->{is_json_string};
+    }
+    if( $isJson != 1 ) {
+        $isJson = 0;
+    }
+
     my $output;
-    $output = $self->_addJSON2Solr($solrCore, $docs, 1);    
+    $output = $self->_addJSON2Solr($solrCore, $docs, $isJson);    
 
 
     #END add_json_2solr
