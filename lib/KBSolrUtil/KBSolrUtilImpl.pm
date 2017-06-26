@@ -503,7 +503,7 @@ sub _addJSON2Solr
             $self->{error} = $response;
             $self->{error}->{errmsg} = $@;
             print "\nSolr indexing error:\n" . $self->_error->{response}; 
-            #print "\n" . Dumper($response);
+            print "\n" . Dumper($response);
             return 0;
     }
 #=cut
