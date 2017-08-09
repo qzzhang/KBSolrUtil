@@ -104,27 +104,6 @@ sub util_timestamp {
 #
 # method name: _buildQueryString
 # Internal Method: to build the query string for SOLR according to the passed parameters
-# parameters:
-# $searchQuery is a hash which specifies how the documents will be searched, see the example below:
-# $searchQuery={
-#   parent_taxon_ref => '1779/116411/1',
-#   rank => 'species',
-#   scientific_lineage => 'cellular organisms; Bacteria; Proteobacteria; Alphaproteobacteria; Rhizobiales; Bradyrhizobiaceae; Bradyrhizobium',
-#   scientific_name => 'Bradyrhizobium sp. *',
-#   domain => 'Bacteria'
-#}
-# OR, simply:
-# $searchQuery= { q => "*" };
-#
-# $searchParams is a hash which specifies how the query results will be displayed, see the example below:
-# $searchParams={                                                                                                                                     
-#   fl => 'object_id,gene_name,genome_source',
-#   wt => 'json',
-#   rows => 20,
-#   sort => 'object_id asc',
-#   hl => 'false',
-#   start => $start
-#}
 #
 # NOTE: Because the stupid SOLR 4.* handles the wildcard search string in a weird way:when the '*' is at either end of the search string, it returns 0 docs.
 # if the search string is within double quotes. On the other hand, when a search string has whitespace(s), it has to be inside
