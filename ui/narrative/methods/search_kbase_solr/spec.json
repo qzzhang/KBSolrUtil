@@ -96,6 +96,30 @@
                   "display": "Roles",
                   "id": "Roles",
                   "ui_name": "Roles"
+                },
+                {
+                  "value": "positive_cd_mine",
+                  "display": "positive_cd_mine",
+                  "id": "positive_cd_mine",
+                  "ui_name": "positive_cd_mine"
+                },
+                {
+                  "value": "positive_enz_mine_mine",
+                  "display": "positive_enz_mine_mine",
+                  "id": "positive_enz_mine_mine",
+                  "ui_name": "positive_enz_mine_mine"
+                },    
+                {
+                  "value": "negative_cd_mine",
+                  "display": "negative_cd_mine",
+                  "id": "negative_cd_mine",
+                  "ui_name": "negative_cd_mine"
+                },
+                {
+                  "value": "negative_enz_mine",
+                  "display": "negative_enz_mine",
+                  "id": "negative_enz_mine",
+                  "ui_name": "negative_enz_mine"
                 }
               ]
             }
