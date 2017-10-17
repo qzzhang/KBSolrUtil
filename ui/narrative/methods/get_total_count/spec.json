@@ -104,10 +104,10 @@
                   "ui_name": "positive_cd_mine"
                 },
                 {
-                  "value": "positive_enz_mine_mine",
-                  "display": "positive_enz_mine_mine",
-                  "id": "positive_enz_mine_mine",
-                  "ui_name": "positive_enz_mine_mine"
+                  "value": "positive_enz_mine",
+                  "display": "positive_enz_mine",
+                  "id": "positive_enz_mine",
+                  "ui_name": "positive_enz_mine"
                 },    
                 {
                   "value": "negative_cd_mine",
